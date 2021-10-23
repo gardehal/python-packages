@@ -1,4 +1,5 @@
 import os
+from posixpath import isabs
 
 class FilePathObject():
     def __init__(self, fullPath = "", directory = "", relativePath = "", fileLeaf = "", filename = "", fileroot = "", extension = "", extensionWithDot = ""):
@@ -11,18 +12,26 @@ class FilePathObject():
         self.extension = extension
         self.extensionWithDot = extensionWithDot
 
-    def __init__(self, relativePath = None, fullPath = None):
-        if(relativePath == None and fullPath == None):
+    def __init__(self, path):
+        if(path == None):
             return None
 
-        _fullPath = os.path.abspath(relativePath)
+        _fullPath = None
+        _relativePath = None
+        if(os.path.isabs(path)):
+            _fullPath = path
+            _relativePath = os.path.realpath(_fullPath)
+        else:
+            _fullPath = os.path.abspath(path)
+            _relativePath = path
+        
         self.fullPath = _fullPath
         self.directory = os.path.split(_fullPath)[0]
-        self.relativePath = relativePath # TODO like ., .., ..\\..\\.. fullpath minus current directory?
+        self.relativePath = _relativePath
         self.fileLeaf = os.path.split(self.directory)[-1]
-        self.filename = os.path.basename(relativePath)
+        self.filename = os.path.basename(_fullPath)
         self.fileroot = self.filename.split(".")[0]
-        self.extension = relativePath.split(".")[-1]
+        self.extension =  _fullPath.split(".")[-1] if ("." in _fullPath) else ""
         self.extensionWithDot = f".{self.extension}"
 
     # https://stackoverflow.com/questions/2235173/what-is-the-naming-standard-for-path-components
