@@ -159,7 +159,7 @@ def requestCall(baseUrl, endpoint, verb, params = None, body = None, headers = N
             time.sleep(timeout)
         else:
             print(f"Request to {baseUrl}{endpoint} failed with code: {response.status_code}.")
-            return None
+            return response
 
     print(f"Web request to {baseUrl}{endpoint} failed all {retries} retries, after a minimum of {retries * timeout} seconds...")
     return response        
