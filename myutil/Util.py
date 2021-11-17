@@ -138,7 +138,7 @@ def asTable(dataArray, labels = None, minColWidth = 6, delim = " | ", startingDe
         
     return tableString 
 
-def requestCall(url, verb, body = None, headers = None, retries = 4, timeout = 4, stream = False):
+def requestCallByUrl(url, verb, body = None, headers = None, retries = 4, timeout = 4, stream = False):
     """
     Make an request (module) call to {url}, using verb. Format params, header, and body like params = {"key1": "value1", "key2": "value2"}, 
     or body as just value. Retries default 4 times, waiting default 4 seconds after fail.
