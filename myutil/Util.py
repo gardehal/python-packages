@@ -44,7 +44,7 @@ def extractArgs(currentArgsIndex, args, numbersOnly = False, pathsOnly = False, 
         _args.append(arg)
     return _args
 
-def printS(*args):
+def printS(*args, color = None):
     """
     Concats all arguments and prints them as string (delim not included).\n\n
     any *args
@@ -52,6 +52,10 @@ def printS(*args):
     res = ""
     for e in args:
         res += str(e)
+
+    if(color):
+        res = wrapColor(res, color)
+
     print(res)
 
 def wrapColor(text, color):
@@ -186,14 +190,24 @@ def arrayContains(arrayA, arrayB):
 
     return False
 
-def mkdir(dirName):
+def mkdir(dirPath):
     """
-    Make directory if none exist.
+    Make directories if none exist. Recursive, will create all parent folders in path.
     """
 
-    # TODO recursive all subdirs
-    if(not os.path.isdir(dirName)):
-        os.mkdir(dirName)
+    currentDir = ""
+    for dir in os.path.normpath(dirPath).split(os.sep):
+        current = os.path.join(currentDir, dir)
+        if(not os.path.isdir(current)):
+            os.mkdir(current)
+            currentDir = current
+
+def printSpinner():
+    """
+    Displays a small spinner.
+    """
+    
+    print("spinner")
 
 colors = {
     "GRAY": "\x1b[1;30;40m",
