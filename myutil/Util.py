@@ -194,13 +194,7 @@ def mkdir(dirPath):
     """
     Make directories if none exist. Recursive, will create all parent folders in path.
     """
-
-    currentDir = ""
-    for dir in os.path.normpath(dirPath).split(os.sep):
-        current = os.path.join(currentDir, dir)
-        if(not os.path.isdir(current)):
-            os.mkdir(current)
-            currentDir = current
+    os.makedirs(dirPath, exist_ok=True)
 
 def printSpinner():
     """
