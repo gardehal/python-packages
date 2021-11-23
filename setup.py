@@ -1,6 +1,6 @@
 import setuptools
 setuptools.setup(name="util",
-version="0.0.3",
+version="0.0.4",
 description="My utils",
 url="#",
 author="",

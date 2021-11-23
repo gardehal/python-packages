@@ -1,14 +1,13 @@
 import os
-from posixpath import isabs
 
 class FilePathObject():
-    def __init__(self, fullPath = "", directory = "", relativePath = "", fileLeaf = "", filename = "", fileroot = "", extension = "", extensionWithDot = ""):
+    def __init__(self, fullPath = "", directory = "", relativePath = "", fileLeaf = "", filename = "", fileRoot = "", extension = "", extensionWithDot = ""):
         self.fullPath = fullPath
         self.directory = directory
         self.relativePath = relativePath
         self.fileLeaf = fileLeaf
         self.filename = filename
-        self.fileroot = fileroot
+        self.fileRoot = fileRoot
         self.extension = extension
         self.extensionWithDot = extensionWithDot
 
@@ -30,7 +29,7 @@ class FilePathObject():
         self.relativePath = _relativePath
         self.fileLeaf = os.path.split(self.directory)[-1]
         self.filename = os.path.basename(_fullPath)
-        self.fileroot = self.filename.split(".")[0]
+        self.fileRoot = ".".join(self.filename.split(".")[:-1])
         self.extension =  _fullPath.split(".")[-1] if ("." in _fullPath) else ""
         self.extensionWithDot = f".{self.extension}"
 
