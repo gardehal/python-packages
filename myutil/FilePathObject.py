@@ -1,7 +1,8 @@
 import os
 
 class FilePathObject():
-    def __init__(self, fullPath = "", directory = "", relativePath = "", fileLeaf = "", filename = "", fileRoot = "", extension = "", extensionWithDot = ""):
+    def __init__(self, isFile: bool = False, fullPath: str = "", directory: str = "", relativePath: str = "", fileLeaf: str = "", filename: str = "", fileRoot: str = "", extension: str = "", extensionWithDot: str = ""):
+        self.isFile: bool = isFile
         self.fullPath: str = fullPath
         self.directory: str = directory
         self.relativePath: str = relativePath
@@ -10,17 +11,21 @@ class FilePathObject():
         self.fileRoot: str = fileRoot
         self.extension: str = extension
         self.extensionWithDot: str = extensionWithDot
+        self.inputPath: str = fullPath
+        self.inputPathClean: str = fullPath
 
     def __init__(self, path: str, debug: bool = False):
         if(path == None):
             if(debug): print("FilePathObject: Argument path is None.")
+            self.isFile = False
             return None
 
-        if(not (os.path.isdir(path) or os.path.isfile(path))):
+        if(not os.path.isfile(path)):
             if(debug): print("FilePathObject: Argument path is not a dir or file.")
+            self.isFile = False
             return None
 
-        _path = path.replace(r"\\\\|\/\/|\/", os.path.sep)
+        _path = path.replace(r"\\\\|\/\/|\/|\\", os.path.sep)
 
         _fullPath = None
         _relativePath = None
@@ -33,6 +38,7 @@ class FilePathObject():
             _fullPath = os.path.abspath(_path)
             _relativePath = _path
         
+        self.isFile: bool = True
         self.fullPath: str = _fullPath
         self.directory: str = os.path.split(_fullPath)[0]
         self.relativePath: str = _relativePath
@@ -52,6 +58,7 @@ class FilePathObject():
 
         myObject = FilePathObject(filePath) returns an object with various strings for values in a file URI (more info in file).\n
         Given URI: C:\\users\\OddThinking\\Documents\\My Source\\Widget\\foo.src
+        - isFile: bool = whether path leads to a recognized file. False whenever something goes wrong.
         - fullPath: str = "C:\\users\\OddThinking\\Documents\\My Source\\Widget\\"\n
         - directory: str = "C:\\users\\OddThinking\\Documents\\My Source\\Widget\\foo.src"\n
         - relativePath: str = relative path from current directory\n
