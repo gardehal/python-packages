@@ -203,6 +203,12 @@ def printSpinner():
     
     print("spinner")
 
+def getIfExists(array, index):
+    """
+    Get the element at index from array, if the length of the array is greater or equal to the index + 1.
+    """
+    return array[index] if len(array) >= index + 1 else None
+    
 colors = {
     "GRAY": "\x1b[1;30;40m",
     "HEADER": "\x1b[95m",
