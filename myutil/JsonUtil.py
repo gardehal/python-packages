@@ -1,6 +1,5 @@
 import json
 from typing import TypeVar, _GenericAlias
-from myutil.Util import *
 
 T = TypeVar("T")
 
