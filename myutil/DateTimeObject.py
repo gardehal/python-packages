@@ -2,6 +2,13 @@ import datetime
 
 class DateTimeObject():
     defaultOffset = "02:00"
+
+    now: datetime = None
+    iso: str = None
+    isoAsNumber: str = None
+    isoWithMilli: str = None
+    isoWithMilliAsNumber: str = None
+
     def __init__(self, offset: str = defaultOffset):
         """
         Init a NOW/CURRENT TIME DateTimeObject with various fields for simpler handleing of time.
@@ -32,11 +39,16 @@ class DateTimeObject():
             DateTimeObject: object with now, iso, isoAsNumber, isoWithMilli, isoWithMilliAsNumber
         """
         
+        if(customDatetime == None):
+            return
+
         self.now = customDatetime
-        self.iso = customDatetime.strftime("%Y-%m-%dT%H:%M:%S") + f"+{offset}" # https://en.wikipedia.org/wiki/ISO_8601
+        self.iso = customDatetime.strftime("%Y-%m-%dT%H:%M:%S.%f") + f"+{offset}" # https://en.wikipedia.org/wiki/ISO_8601
         self.isoAsNumber = customDatetime.strftime("%Y%m%d%H%M%S") + offset.replace(":", "")
         self.isoWithMilli = customDatetime.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + f"+{offset}"
         self.isoWithMilliAsNumber = customDatetime.strftime("%Y%m%d%H%M%S%f")[:-3] # All but [0-9] removed
+
+        return self
         
     def fromString(self, customDatetimeStr: str, offset: str = defaultOffset):
         """
@@ -50,9 +62,14 @@ class DateTimeObject():
             DateTimeObject: object with now, iso, isoAsNumber, isoWithMilli, isoWithMilliAsNumber
         """
         
-        _customDatetime = datetime.datetime.strptime(customDatetimeStr, "%Y-%m-%d %H:%M:%S")
+        if(customDatetimeStr == None):
+            return
+
+        _customDatetime = datetime.datetime.strptime(customDatetimeStr, "%Y-%m-%d %H:%M:%S.%f")
         self.now = _customDatetime
         self.iso = _customDatetime.strftime("%Y-%m-%dT%H:%M:%S") + f"+{offset}" # https://en.wikipedia.org/wiki/ISO_8601
         self.isoAsNumber = _customDatetime.strftime("%Y%m%d%H%M%S") + offset.replace(":", "")
         self.isoWithMilli = _customDatetime.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + f"+{offset}"
         self.isoWithMilliAsNumber = _customDatetime.strftime("%Y%m%d%H%M%S%f")[:-3] # All but [0-9] removed
+
+        return self
