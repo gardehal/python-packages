@@ -30,7 +30,7 @@ class LocalJsonRepository(Generic[T]):
             bool: success = True
         """
 
-        _entity = LocalJsonRepository.get(self, entity.id)
+        _entity = self.get(self, entity.id)
         if(_entity != None):
             if(self.debug): printS("Error adding ", entity.id, ", ID already exists", color=colors["FAIL"])
             return False
@@ -65,7 +65,10 @@ class LocalJsonRepository(Generic[T]):
             if(not os.path.isfile(_path)):
                 return None
 
-            _fileContent = open(_path, "r").read()
+            _fileContent = None
+            with open(_path, "r") as file:
+                _fileContent = file.read()
+            
             if(len(_fileContent) < 2):
                 return None
             else:
@@ -86,10 +89,13 @@ class LocalJsonRepository(Generic[T]):
         try:
             _all = []
             _globPath = glob.glob(f"{self.storagePath}/*.json")
-            for file in _globPath:
-                fileContent = open(file, "r").read()
-                if(len(fileContent) > 2):
-                    _all.append(JsonUtil.fromJson(fileContent, self.typeT))
+            for _path in _globPath:
+                _fileContent = None
+                with open(_path, "r") as file:
+                    _fileContent = file.read()
+
+                if(len(_fileContent) > 2):
+                    _all.append(JsonUtil.fromJson(_fileContent, self.typeT))
             
             return _all
         except Exception:
@@ -108,7 +114,7 @@ class LocalJsonRepository(Generic[T]):
             bool: success = True
         """
 
-        _entity = LocalJsonRepository.get(self, entity.id)
+        _entity = self.get(self, entity.id)
         if(_entity == None):
             printS("Error updating ", entity.id, ", entity does not exist", color=colors["FAIL"])
             return False
@@ -137,7 +143,7 @@ class LocalJsonRepository(Generic[T]):
             bool: success = True
         """
 
-        _entity = LocalJsonRepository.get(self, id)
+        _entity = self.get(self, id)
         if(_entity == None):
             printS("Error removeing ", id, ", entity does not exist", color=colors["FAIL"])
             return False
