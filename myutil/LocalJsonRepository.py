@@ -30,7 +30,7 @@ class LocalJsonRepository(Generic[T]):
             bool: success = True
         """
 
-        _entity = self.get(self, entity.id)
+        _entity = self.get(entity.id)
         if(_entity != None):
             if(self.debug): printS("Error adding ", entity.id, ", ID already exists", color=colors["FAIL"])
             return False
@@ -114,7 +114,7 @@ class LocalJsonRepository(Generic[T]):
             bool: success = True
         """
 
-        _entity = self.get(self, entity.id)
+        _entity = self.get(entity.id)
         if(_entity == None):
             printS("Error updating ", entity.id, ", entity does not exist", color=colors["FAIL"])
             return False
@@ -143,7 +143,7 @@ class LocalJsonRepository(Generic[T]):
             bool: success = True
         """
 
-        _entity = self.get(self, id)
+        _entity = self.get(id)
         if(_entity == None):
             printS("Error removeing ", id, ", entity does not exist", color=colors["FAIL"])
             return False
