@@ -44,19 +44,27 @@ def extractArgs(currentArgsIndex, args, numbersOnly = False, pathsOnly = False, 
         _args.append(arg)
     return _args
 
-def printS(*args, color = None):
+def printS(*args, color = None, doPrint: bool = True) -> None:
     """
-    Concats all arguments and prints them as string (delim not included).\n\n
-    any *args
+    Concats all arguments and prints them as string (delim not included).
+
+    Args:
+        color ([type], optional): Color from colors-dictionary. Defaults to None (normal color).
+        doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
     """
-    res = ""
-    for e in args:
-        res += str(e)
+    
+    if(not doPrint):
+        return None
+    
+    _message = ""
+    for _element in args:
+        _message += str(_element)
 
     if(color):
-        res = wrapColor(res, color)
+        _message = wrapColor(_message, color)
 
-    print(res)
+    print(_message)
+    return None
 
 def wrapColor(text, color):
     """
@@ -233,16 +241,43 @@ def getIfExists(array, index):
     """
     return array[index] if len(array) >= index + 1 else None
     
+# https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal?rq=1
 colors = {
-    "GRAY": "\x1b[1;30;40m",
+    "": "",
+    "GREY": "\x1b[1;30;40m",
     "HEADER": "\x1b[95m",
     "OKBLUE": "\x1b[94m",
     "OKGREEN": "\x1b[92m",
     "WARNING": "\x1b[93m",
     "FAIL": "\x1b[91m",
+    "ERROR": "\x1b[91m",
     "ENDC": "\x1b[0m",
+    
     "BOLD": "\x1b[1m",
-    "UNDERLINE": "\x1b[4m",
+    "ITALIC": "\x1b[3m",
+    "URL": "\x1b[4m",
+    "BLINK": "\x1b[5m",
+    "BLINK2": "\x1b[6m",
+    "SELECTED": "\x1b[7m",
+    
+    "BLACK": "\x1b[30m",
+    "RED": "\x1b[31m",
+    "GREEN": "\x1b[32m",
+    "YELLOW": "\x1b[33m",
+    "BLUE": "\x1b[34m",
+    "VIOLET": "\x1b[35m",
+    "TEAL": "\x1b[36m",
+    "WHITE": "\x1b[37m",
+    
+    "BLACKBG": "\x1b[40m",
+    "REDBG": "\x1b[41m",
+    "GREENBG": "\x1b[42m",
+    "YELLOWBG": "\x1b[43m",
+    "BLUEBG": "\x1b[44m",
+    "VIOLETBG": "\x1b[45m",
+    "TEALBG": "\x1b[46m",
+    "WHITEBG": "\x1b[47m",
+    "GREYBG": "\x1b[100m"
 }
 
 class HttpVerb(Enum):
