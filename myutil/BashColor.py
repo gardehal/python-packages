@@ -1,4 +1,8 @@
-class BashColors():
+
+
+from enum import Enum
+
+class BashColor(Enum):
     # https://stackoverflow.com/questions/287871/how-to-print-colored-text-to-the-terminal?rq=1
     NONE = ""
     GREY = "\x1b[1;30;40m"
