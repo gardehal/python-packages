@@ -3,6 +3,7 @@ import os
 from myutil.BashColor import BashColor
 from myutil.PrintUtil import printS
 
+
 def mkdir(dirPath) -> None:
     """
     Make directories, given a path that does not exist, that path and parent directories will be created.

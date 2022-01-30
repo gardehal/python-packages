@@ -4,8 +4,9 @@ import sys
 from typing import Generic, List, TypeVar
 
 from myutil.BashColor import BashColor
-from myutil.PrintUtil import printS
 from myutil.FileUtil import mkdir
+from myutil.PrintUtil import printS
+
 from .JsonUtil import *
 
 T = TypeVar("T")

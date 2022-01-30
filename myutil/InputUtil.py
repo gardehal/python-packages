@@ -1,8 +1,10 @@
-import re
 import os
+import re
+
 import validators
 
 from myutil.PrintUtil import printS
+
 
 def extractArgs(currentArgsIndex, args, numbersOnly = False, pathsOnly = False, urlsOnly = False, flagIndicator = "-"):
     """

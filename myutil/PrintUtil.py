@@ -1,11 +1,12 @@
-import sys
 import os
+import sys
 import threading
 import time
 
-from myutil.ShellType import ShellType
 from myutil.BashColor import BashColor
+from myutil.ShellType import ShellType
 from myutil.ShellUtil import *
+
 
 def disablePrint():
     """

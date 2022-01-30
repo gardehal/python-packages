@@ -1,8 +1,10 @@
-import requests
 import time
+
+import requests
 from furl import furl
 
 from myutil.HttpVerb import HttpVerb
+
 
 def requestCallByUrl(url, verb, body = None, headers = None, retries = 4, timeout = 4, stream = False):
     """

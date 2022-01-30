@@ -1,7 +1,9 @@
 import os
+
 import psutil
 
 from myutil.ShellType import ShellType
+
 
 def getCurrentShellType() -> ShellType:
     """
