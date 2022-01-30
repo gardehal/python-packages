@@ -2,7 +2,10 @@ import sys
 import os
 import threading
 import time
-from myutil.BashColors import BashColors
+
+from myutil.ShellType import ShellType
+from myutil.BashColor import BashColor
+from myutil.ShellUtil import *
 
 def disablePrint():
     """
@@ -38,29 +41,29 @@ def printS(*args, color = None, doPrint: bool = True) -> None:
     print(_message)
     return None
 
-def wrapColor(text: str, color: BashColors, overrideColor: str = None) -> str:
+def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
     """
     NB: Will not work in non-compatible terminals like Windows CMD. If this is detected, this will return the text without color.
     Wraps text in ASCI colours for terminal usage.
-    See colours in BashColors class, argument accepts ANCI code like "\\x1b[0;34;42m".
+    See colours in BashColor class, argument accepts ANCI code like "\\x1b[0;34;42m".
 
     Args:
         text (str): text to wrap
-        color (BashColors): color to use
+        color (BashColor): color to use
         overrideColor (str): a string with the color to use, custom set, like "\\x1b[0;34;42m"
 
     Returns:
         str: input text wrapped in the ASCII colours
     """
     
-    if():
+    if(getCurrentShellType() != ShellType.BASH):
         return text
     
     _color = color
     if(str(overrideColor[0]) == "\x1b"):
         _color = color
 
-    return _color + str(text) + BashColors.ENDC
+    return _color + str(text) + BashColor.ENDC
 
 def asTableRow(dataArray, labels = None, minColWidth = 6, delim = " | ", startingDelim = False):
     """

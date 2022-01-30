@@ -1,16 +1,21 @@
 import os
 
-from myutil.PrintUtil import *
+from myutil.BashColor import BashColor
+from myutil.PrintUtil import printS
 
-def mkdir(dirPath):
+def mkdir(dirPath) -> None:
     """
-    Make directories if none exist. Recursive, will create all parent folders in path.
+    Make directories, given a path that does not exist, that path and parent directories will be created.
+
+    Args:
+        dirPath (str): path of directories
     """
-    os.makedirs(dirPath, exist_ok=True)
+    
+    os.makedirs(dirPath, exist_ok = True)
 
 def makeFiles(*args) -> bool:
     """
-    Create local files used for storing settings, video ques, sources etc.
+    Create local files given by list of args.
 
     Args:
         args (list): paths+filenames to create
@@ -24,7 +29,7 @@ def makeFiles(*args) -> bool:
             if(not os.path.exists(os.path.dirname(filepath))):
                 os.makedirs(os.path.dirname(filepath))
         except OSError as exc: # Guard against race condition
-            printS("There was a temporary error creating file ", filepath, ".", color = BashColors.ERROR)
+            printS("There was a temporary error creating file ", filepath, ".", color = BashColor.ERROR)
             continue
 
         file = open(filepath, "a")
