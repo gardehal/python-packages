@@ -60,11 +60,11 @@ def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
     if(getCurrentShellType() != ShellType.BASH):
         return text
     
-    _color = color
-    if(str(overrideColor[0]) == "\x1b"):
+    _color = color.value
+    if(overrideColor != None and str(overrideColor[0]) == "\x1b"):
         _color = color
 
-    return _color + str(text) + BashColor.ENDC
+    return _color + str(text) + BashColor.ENDC.value
 
 def asTableRow(dataArray, labels = None, minColWidth = 6, delim = " | ", startingDelim = False):
     """
