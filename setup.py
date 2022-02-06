@@ -1,6 +1,6 @@
 import setuptools
 setuptools.setup(name="util",
-version="1.0.1",
+version="1.0.2",
 description="Various Python utility methods, printing, input handleing, colouring text in Bash, and more.",
 url="#",
 author="",

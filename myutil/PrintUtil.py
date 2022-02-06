@@ -2,6 +2,7 @@ import os
 import sys
 import threading
 import time
+from typing import List
 
 from myutil.BashColor import BashColor
 from myutil.ShellType import ShellType
@@ -110,6 +111,28 @@ def asTable(dataArray, labels = None, minColWidth = 6, delim = " | ", startingDe
         tableString += line if i % 2 != 0 else wrapColor(line, "gray")
         
     return tableString 
+
+def printLists(data: List[List[str]], titles: List[str]) -> bool:
+    """
+    Prints all lists in data, with title before corresponding list.
+
+    Args:
+        data (List[List[str]]): List if Lists to print
+        titles (List[str]): List of titles, index 0 is title for data List index 0 etc.
+
+    Returns:
+        bool: true = success
+    """
+    
+    for i, dataList in enumerate(data):
+        printS("\n", titles[i], color = BashColor.BOLD)
+        printS("No data.", color = BashColor.WARNING, doPrint = len(dataList) == 0) 
+        
+        for j, entry in enumerate(dataList):
+            _color = "WHITE" if j % 2 == 0 else "GREYBG"
+            printS(entry, color = BashColor[_color]) 
+            
+    return True
 
 def printSpinner(pause: float = 0.2) -> None:
     """
