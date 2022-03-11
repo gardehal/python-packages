@@ -4,9 +4,9 @@ from datetime import datetime
 from typing import List
 
 from dotenv import load_dotenv
-from myutil.BashColor import BashColor
-from myutil.LocalJsonRepository import LocalJsonRepository
-from myutil.PrintUtil import printS
+from grdUtil.BashColor import BashColor
+from grdUtil.LocalJsonRepository import LocalJsonRepository
+from grdUtil.PrintUtil import printS
 
 load_dotenv()
 # DEBUG = eval(os.environ.get("DEBUG"))

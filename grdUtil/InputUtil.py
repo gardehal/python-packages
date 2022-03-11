@@ -4,8 +4,8 @@ from typing import List
 
 import validators
 
-from myutil.BashColor import BashColor
-from myutil.PrintUtil import printS
+from grdUtil.BashColor import BashColor
+from grdUtil.PrintUtil import printS
 
 
 def extractArgs(currentArgsIndex, args, numbersOnly = False, pathsOnly = False, urlsOnly = False, flagIndicator = "-"):

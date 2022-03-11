@@ -4,9 +4,9 @@ import threading
 import time
 from typing import List
 
-from myutil.BashColor import BashColor
-from myutil.ShellType import ShellType
-from myutil.ShellUtil import *
+from grdUtil.BashColor import BashColor
+from grdUtil.ShellType import ShellType
+from grdUtil.ShellUtil import *
 
 
 def disablePrint():

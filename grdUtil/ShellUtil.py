@@ -2,7 +2,7 @@ import os
 
 import psutil
 
-from myutil.ShellType import ShellType
+from grdUtil.ShellType import ShellType
 
 
 def getCurrentShellType() -> ShellType:
