@@ -1,6 +1,6 @@
 import setuptools
 setuptools.setup(name="grdUtil",
-version="1.1.0",
+version="1.1.1",
 description="Various Python utility methods, printing, input handleing, colouring text in Bash, and more.",
 url="#",
 author="",
