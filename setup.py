@@ -1,10 +1,15 @@
 import setuptools
+
+# Get requirements requirements.txt, from https://stackoverflow.com/questions/6947988/when-to-use-pip-requirements-file-versus-install-requires-in-setup-py
+REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
+
 setuptools.setup(name="grdUtil",
-version="1.1.1",
+version="1.2.0",
 description="Various Python utility methods, printing, input handling, colouring text in Bash, and more.",
 url="https://github.com/grdall/python-packages",
-author="",
-install_requires=["requests>=2.0.0"],
+author="grdAll",
+install_requires=REQUIREMENTS,
 author_email="",
-packages=setuptools.find_packages(),
+packages=["grdUtil", "grdExceptions"],
+license="MIT",
 zip_safe=False)
