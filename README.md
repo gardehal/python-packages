@@ -13,3 +13,9 @@
     - $ `python pip list`
 1. Purge (external) packages
     - $ `python -m pip cache purge`
+
+## TODO
+
+- base class for service
+- update old methods with proper docstrings
+- import more common functions/exceptions
