@@ -90,12 +90,15 @@ def asTableRow(dataArray: List[str], labels: List[str] = [], minColWidth: int = 
 
     row = delim if startingDelim else ""
     for i in range(0, len(dataArray)):
+        data = dataArray[i] if len(dataArray) >= i + 1 else None
+        label = labels[i] if len(labels) >= i + 1 else None
         _minColWidth = minColWidth
-        if(len(labels) > 0 and len(labels[i]) > 0):
-            _minColWidth = len(str(labels[i])) if len(str(labels[i])) > minColWidth else minColWidth
+        if(len(labels) > 0 and len(str(label)) > 0):
+            _minColWidth = len(str(label)) if len(str(label)) > minColWidth else minColWidth
 
-        spacePadding = " " * (_minColWidth - len(str(dataArray[i])))
-        row += str(dataArray[i]).replace("\n", "") + spacePadding + delim
+        spacePadding = " " * (_minColWidth - len(str(data)))
+        value = data if(data != None, len(data) > 0) else ""
+        row += str(value).replace("\n", "") + spacePadding + delim
         
     return row
 
@@ -120,14 +123,14 @@ def asTable(dataArray: List[List[str]], labels: List[str] = [], minColWidth: int
         raise ArgumentException("asTable - argument labels was not a valid list of strings.")
 
     tableString = ""
-    if(len(labels) > 0):
+    if(labels != None and len(labels) > 0):
         labelRow = asTableRow(labels, labels, minColWidth, delim, startingDelim)
         tableString += labelRow + "\n"
         tableString += ("-" * len(labelRow)) + "\n"
         
     for i in range(0, len(dataArray)):
         line = asTableRow(dataArray[i], labels, minColWidth, delim, startingDelim) + "\n"
-        tableString += line if i % 2 != 0 else wrapColor(line, "gray")
+        tableString += line if i % 2 != 0 else wrapColor(line, color = BashColor.GREY)
         
     return tableString 
 
