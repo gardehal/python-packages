@@ -111,11 +111,19 @@ def isNumber(n, intOnly = False):
         else:
             return True
 
-def getIfExists(array, index):
+def getIfExists(array: List[any], index: int, default: any = None) -> any:
     """
     Get the element at index from array, if the length of the array is greater or equal to the index + 1.
+
+    Args:
+        array (List[any]): List to get from.
+        index (int): Index to get.
+        default (any, optional): Default value if item does not exist. Defaults to None.
+
+    Returns:
+        any: index of list if exists, else default
     """
-    return array[index] if len(array) >= index + 1 else None
+    return array[index] if len(array) >= index + 1 else default
 
 def sanitize(*args, mode: int = 1) -> str:
     """
