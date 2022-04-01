@@ -3,6 +3,7 @@ import sys
 import threading
 import time
 from typing import List
+from grdExceptions.ArgumentException import ArgumentException
 
 from grdUtil.BashColor import BashColor
 from grdUtil.ShellType import ShellType
@@ -67,16 +68,25 @@ def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
 
     return _color + str(text) + BashColor.ENDC.value
 
-def asTableRow(dataArray, labels = None, minColWidth = 6, delim = " | ", startingDelim = False):
+def asTableRow(dataArray: List[str], labels: List[str] = [], minColWidth: int = 6, delim: str = " | ", startingDelim: bool = False) -> str:
     """
-    Returns a string row of values as a row in tables.\n\n
+    Returns a string row of values as a row in tables, using labels to make the cell width.
+    
+    Args:
+        dataArray (List[List[str]]): Array of any dataArray (2D)
+        labels (List[str], optional): Array of any labels (1D). Defaults to [].
+        minColWidth (int, optional): Mimimum column width. Defaults to 6.
+        delim (str, optional): Deliminator or columns. Defaults to " | ".
+        startingDelim (bool, optional): Should include startin deliminator? Defaults to False.
 
-    Array of any dataArray (1D)
-    Array of any labels (1D)
-    int minColWidth
-    string delim
-    bool startingDelim
+    Returns:
+        str: dataArray as a row
     """
+    
+    if(not isinstance(dataArray, List)):
+        raise ArgumentException("asTableRow - argument dataArray was not a valid list of list of strings.")
+    if(not isinstance(labels, List)):
+        raise ArgumentException("asTableRow - argument labels was not a valid list of strings.")
 
     row = delim if startingDelim else ""
     for i in range(0, len(dataArray)):
@@ -89,16 +99,25 @@ def asTableRow(dataArray, labels = None, minColWidth = 6, delim = " | ", startin
         
     return row
 
-def asTable(dataArray, labels = None, minColWidth = 6, delim = " | ", startingDelim = False):
+def asTable(dataArray: List[List[str]], labels: List[str] = [], minColWidth: int = 6, delim: str = " | ", startingDelim: bool = False) -> str:
     """
-    Returns a string formatted as a table.\n\n
+    Returns a string formatted as a table.
 
-    Array of any dataArray (2D)
-    Array of any labels (1D)
-    int minColWidth
-    string delim
-    bool startingDelim
+    Args:
+        dataArray (List[List[str]]): Array of any dataArray (2D)
+        labels (List[str], optional): Array of any labels (1D). Defaults to [].
+        minColWidth (int, optional): Mimimum column width. Defaults to 6.
+        delim (str, optional): Deliminator or columns. Defaults to " | ".
+        startingDelim (bool, optional): Should include startin deliminator? Defaults to False.
+
+    Returns:
+        str: dataArray and labels as a table
     """
+    
+    if(not isinstance(dataArray, List) or not isinstance(dataArray[0], List)):
+        raise ArgumentException("asTable - argument dataArray was not a valid list of list of strings.")
+    if(not isinstance(labels, List)):
+        raise ArgumentException("asTable - argument labels was not a valid list of strings.")
 
     tableString = ""
     if(len(labels) > 0):
