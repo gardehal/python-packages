@@ -68,16 +68,16 @@ def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
 
     return _color + str(text) + BashColor.ENDC.value
 
-def asTableRow(dataArray: List[str], labels: List[str] = [], minColWidth: int = 6, delim: str = " | ", startingDelim: bool = False) -> str:
+def asTableRow(dataArray: List[str], templateRow: List[str] = [], minColWidth: int = 6, delim: str = " | ", edgeDelim: bool = True) -> str:
     """
     Returns a string row of values as a row in tables, using labels to make the cell width.
     
     Args:
-        dataArray (List[List[str]]): Array of any dataArray (2D)
-        labels (List[str], optional): Array of any labels (1D). Defaults to [].
+        dataArray (List[List[str]]): 1D List of data to put in row.
+        templateRow (List[str], optional): 1D List used as template for width of columns. Defaults to [].
         minColWidth (int, optional): Mimimum column width. Defaults to 6.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
-        startingDelim (bool, optional): Should include startin deliminator? Defaults to False.
+        edgeDelim (bool, optional): Should include startin deliminator? Defaults to False.
 
     Returns:
         str: dataArray as a row
@@ -85,15 +85,15 @@ def asTableRow(dataArray: List[str], labels: List[str] = [], minColWidth: int = 
     
     if(not isinstance(dataArray, List)):
         raise ArgumentException("asTableRow - argument dataArray was not a valid list of list of strings.")
-    if(not isinstance(labels, List)):
-        raise ArgumentException("asTableRow - argument labels was not a valid list of strings.")
+    if(not isinstance(templateRow, List)):
+        raise ArgumentException("asTableRow - argument templateRow was not a valid list of strings.")
 
-    row = delim if startingDelim else ""
-    for i in range(0, len(dataArray)):
-        data = dataArray[i] if len(dataArray) >= i + 1 else None
-        label = labels[i] if len(labels) >= i + 1 else None
+    row = delim if edgeDelim else ""
+    for i, data in enumerate(dataArray):
+        data = str(data)
+        label = templateRow[i] if len(templateRow) >= i + 1 else None
         _minColWidth = minColWidth
-        if(len(labels) > 0 and len(str(label)) > 0):
+        if(len(templateRow) > 0 and len(str(label)) > 0):
             _minColWidth = len(str(label)) if len(str(label)) > minColWidth else minColWidth
 
         spacePadding = " " * (_minColWidth - len(str(data)))
@@ -102,16 +102,44 @@ def asTableRow(dataArray: List[str], labels: List[str] = [], minColWidth: int = 
         
     return row
 
-def asTable(dataArray: List[List[str]], labels: List[str] = [], minColWidth: int = 6, delim: str = " | ", startingDelim: bool = False) -> str:
+def getRowSpacer(templateRow: List[str], corner: str = " + ", edgeDelim: bool = True) -> str:
+    """
+    Returns a string row of values as a row in tables, using labels to make the cell width.
+    
+    Args:
+        templateRow (List[str]): 1D List used as template for width of columns.
+        corner (str, optional): Corner symbol of a cell. Defaults to " + ".
+        edgeDelim (bool, optional): Should include startin deliminator? Defaults to False.
+
+    Returns:
+        str: row spacer
+    """
+    
+    if(not isinstance(templateRow, List)):
+        raise ArgumentException("getRowSpacer - argument templateRow was not a valid list of strings.")
+
+    row = corner if edgeDelim else ""
+    for i, template in enumerate(templateRow):
+        row += ("-" * len(template)) + "\n"
+        
+    row += corner if edgeDelim else ""
+    return row
+
+# TODO sep. method for table by columns
+
+def asTable(dataArray: List[List[str]], labels: List[str], minColWidth: int = 6, delim: str = " | ", 
+            edgeDelim: bool = True, includeRowDividers: bool = False, alternateRowColor: BashColor = BashColor.NONE) -> str:
     """
     Returns a string formatted as a table.
 
     Args:
-        dataArray (List[List[str]]): Array of any dataArray (2D)
-        labels (List[str], optional): Array of any labels (1D). Defaults to [].
+        dataArray (List[List[str]]): sD List of Lists of data to put in table.
+        labels (List[str], optional): 1D List of labels per column, also used as template for width of columns.
         minColWidth (int, optional): Mimimum column width. Defaults to 6.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
-        startingDelim (bool, optional): Should include startin deliminator? Defaults to False.
+        edgeDelim (bool, optional): Should include start and end deliminator? Defaults to False.
+        includeRowDividers(bool, optional): Should string include dividers between each row? Defaults to False.
+        alternateRowColor(bool, optional): BashColor to use on alternate rows. Defaults to BashColor.NONE.
 
     Returns:
         str: dataArray and labels as a table
@@ -124,13 +152,13 @@ def asTable(dataArray: List[List[str]], labels: List[str] = [], minColWidth: int
 
     tableString = ""
     if(labels != None and len(labels) > 0):
-        labelRow = asTableRow(labels, labels, minColWidth, delim, startingDelim)
+        labelRow = asTableRow(labels, labels, minColWidth, delim, edgeDelim)
         tableString += labelRow + "\n"
         tableString += ("-" * len(labelRow)) + "\n"
         
-    for i in range(0, len(dataArray)):
-        line = asTableRow(dataArray[i], labels, minColWidth, delim, startingDelim) + "\n"
-        tableString += line if i % 2 != 0 else wrapColor(line, color = BashColor.GREY)
+    for i, data in enumerate(dataArray):
+        line = asTableRow(data, labels, minColWidth, delim, edgeDelim) + "\n"
+        tableString += line if i % 2 != 0 else wrapColor(line, color = alternateRowColor)
         
     return tableString 
 
@@ -161,7 +189,7 @@ def printSpinner(pause: float = 0.2) -> None:
     Print one rotation of a spinner to inform the user that the program is working. This method must be constantly called to keep the spinner going.
     
     Args:
-        pause (float): Pause between between change in the spinner
+        pause (float): Pause between between change in the spinner in seconds
     """
     
     print(" - ", end = "\r")
