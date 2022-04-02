@@ -68,14 +68,67 @@ def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
 
     return _color + str(text) + BashColor.ENDC.value
 
-def asTableRow(dataArray: List[str], templateRow: List[str] = [], minColWidth: int = 6, delim: str = " | ", edgeDelim: bool = True) -> str:
+def getMaxColumWidth(dataArray: List[List[str]], labels: List[str], paddingSpace: int = 2) -> List[int]:
+    """
+    Get maximum width of a colum given a 2D array.
+
+    Args:
+        dataArray (List[List[str]]): 2D List of Lists of data to put in table.
+        labels (List[str]): 1D List of labels.
+        paddingSpace (int): Length of padding space to take into account, eg. "foo" = 0, " bar " = 2.
+
+    Returns:
+        List[int]: widths of the widest strings per column
+    """
+    
+    if(not isinstance(dataArray, List) or not isinstance(dataArray[0], List)):
+        raise ArgumentException("getMaxColumWidth - argument templateRow was not a valid list of strings.")
+    if(not isinstance(labels, List)):
+        raise ArgumentException("getMaxColumWidth - argument labels was not a valid list of strings.")
+    if(len(labels) != len(dataArray[0])):
+        raise ArgumentException("getMaxColumWidth - argument labels and dataArray[0] (and other instances in dataArray?) does not match in length.")
+    
+    result = []
+    for label in labels:
+        result.append(len(str(label)) + paddingSpace)
+        
+    for row in dataArray:
+        for i, data in enumerate(row):
+            updated = len(str(data)) + paddingSpace
+            if(updated > result[i]):
+                result[i] = updated
+                
+    return result
+    
+def getRowSpacer(templateArray: List[int], corner: str = "+", spacer: str = "-", edgeDelim: bool = True) -> str:
+    """
+    Returns a string row of values as a row in tables, using labels to make the cell width.
+    
+    Args:
+        templateArray (List[int]): List used as template for width of columns.
+        corner (str, optional): Corner symbol of a cell. Defaults to "+".
+        spacer (str, optional): Main symbol of the spacer. Defaults to "-".
+        edgeDelim (bool, optional): Should include startin deliminator? Defaults to False.
+
+    Returns:
+        str: row spacer
+    """
+
+    row = corner if edgeDelim else ""
+    for i, width in enumerate(templateArray):
+        row += (spacer * width)
+        row += corner if(i + 1 < len(templateArray)) else ""
+        
+    row += corner if edgeDelim else ""
+    return row
+
+def asTableRow(dataArray: List[str], templateArray: List[int], delim: str = " | ", edgeDelim: bool = True) -> str:
     """
     Returns a string row of values as a row in tables, using labels to make the cell width.
     
     Args:
         dataArray (List[List[str]]): 1D List of data to put in row.
-        templateRow (List[str], optional): 1D List used as template for width of columns. Defaults to [].
-        minColWidth (int, optional): Mimimum column width. Defaults to 6.
+        templateArray (List[int]): List used as template for width of columns.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
         edgeDelim (bool, optional): Should include startin deliminator? Defaults to False.
 
@@ -83,57 +136,27 @@ def asTableRow(dataArray: List[str], templateRow: List[str] = [], minColWidth: i
         str: dataArray as a row
     """
     
-    if(not isinstance(dataArray, List)):
-        raise ArgumentException("asTableRow - argument dataArray was not a valid list of list of strings.")
-    if(not isinstance(templateRow, List)):
-        raise ArgumentException("asTableRow - argument templateRow was not a valid list of strings.")
-
     row = delim if edgeDelim else ""
     for i, data in enumerate(dataArray):
-        data = str(data)
-        label = templateRow[i] if len(templateRow) >= i + 1 else None
-        _minColWidth = minColWidth
-        if(len(templateRow) > 0 and len(str(label)) > 0):
-            _minColWidth = len(str(label)) if len(str(label)) > minColWidth else minColWidth
-
-        spacePadding = " " * (_minColWidth - len(str(data)))
+        data = str(data).replace("\n", "")
+        spacePaddingBefore = " "
+        spacePaddingAfter = " " * (templateArray[i] - len(data) - 1)
         value = data if(data != None, len(data) > 0) else ""
-        row += str(value).replace("\n", "") + spacePadding + delim
+        row += spacePaddingBefore + value + spacePaddingAfter
+        row += delim if(i + 1 < len(templateArray)) else ""
         
-    return row
-
-def getRowSpacer(templateRow: List[str], corner: str = " + ", edgeDelim: bool = True) -> str:
-    """
-    Returns a string row of values as a row in tables, using labels to make the cell width.
-    
-    Args:
-        templateRow (List[str]): 1D List used as template for width of columns.
-        corner (str, optional): Corner symbol of a cell. Defaults to " + ".
-        edgeDelim (bool, optional): Should include startin deliminator? Defaults to False.
-
-    Returns:
-        str: row spacer
-    """
-    
-    if(not isinstance(templateRow, List)):
-        raise ArgumentException("getRowSpacer - argument templateRow was not a valid list of strings.")
-
-    row = corner if edgeDelim else ""
-    for i, template in enumerate(templateRow):
-        row += ("-" * len(template)) + "\n"
-        
-    row += corner if edgeDelim else ""
+    row += delim if edgeDelim else ""
     return row
 
 # TODO sep. method for table by columns
 
-def asTable(dataArray: List[List[str]], labels: List[str], minColWidth: int = 6, delim: str = " | ", 
+def asTable(dataArray: List[List[str]], labels: List[str], delim: str = "|", minColWidth: int = 6,
             edgeDelim: bool = True, includeRowDividers: bool = False, alternateRowColor: BashColor = BashColor.NONE) -> str:
     """
     Returns a string formatted as a table.
 
     Args:
-        dataArray (List[List[str]]): sD List of Lists of data to put in table.
+        dataArray (List[List[str]]): 2D List of Lists of data to put in table.
         labels (List[str], optional): 1D List of labels per column, also used as template for width of columns.
         minColWidth (int, optional): Mimimum column width. Defaults to 6.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
@@ -150,14 +173,17 @@ def asTable(dataArray: List[List[str]], labels: List[str], minColWidth: int = 6,
     if(not isinstance(labels, List)):
         raise ArgumentException("asTable - argument labels was not a valid list of strings.")
 
+    template = getMaxColumWidth(dataArray, labels)
     tableString = ""
-    if(labels != None and len(labels) > 0):
-        labelRow = asTableRow(labels, labels, minColWidth, delim, edgeDelim)
-        tableString += labelRow + "\n"
-        tableString += ("-" * len(labelRow)) + "\n"
-        
+    
+    # Label row
+    labelRow = asTableRow(labels, template, delim, edgeDelim)
+    tableString += labelRow + "\n"
+    tableString += getRowSpacer(template) + "\n"
+    
+    # Data rows
     for i, data in enumerate(dataArray):
-        line = asTableRow(data, labels, minColWidth, delim, edgeDelim) + "\n"
+        line = asTableRow(data, template, delim, edgeDelim) + "\n"
         tableString += line if i % 2 != 0 else wrapColor(line, color = alternateRowColor)
         
     return tableString 
