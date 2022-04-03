@@ -148,15 +148,13 @@ def asTableRow(dataArray: List[str], templateArray: List[int], delim: str = " | 
     row += delim if edgeDelim else ""
     return row
 
-# TODO sep. method for table by columns
-
-def asTable(dataArray: List[List[str]], labels: List[str], delim: str = "|", minColWidth: int = 6,
+def asTable(dataArray: List[List[str]], labels: List[str], delim: str = "|",
             edgeDelim: bool = True, includeRowDividers: bool = False, alternateRowColor: BashColor = BashColor.NONE) -> str:
     """
     Returns a string formatted as a table.
 
     Args:
-        dataArray (List[List[str]]): 2D List of Lists of data to put in table.
+        dataArray (List[List[str]]): 2D List of Lists of rows to put in table.
         labels (List[str], optional): 1D List of labels per column, also used as template for width of columns.
         minColWidth (int, optional): Mimimum column width. Defaults to 6.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
@@ -174,19 +172,22 @@ def asTable(dataArray: List[List[str]], labels: List[str], delim: str = "|", min
         raise ArgumentException("asTable - argument labels was not a valid list of strings.")
 
     template = getMaxColumWidth(dataArray, labels)
+    rowSpacer = getRowSpacer(template)
     tableString = ""
     
     # Label row
     labelRow = asTableRow(labels, template, delim, edgeDelim)
+    tableString += (rowSpacer + "\n") if includeRowDividers else ""
     tableString += labelRow + "\n"
-    tableString += getRowSpacer(template) + "\n"
+    tableString += rowSpacer + "\n"
     
     # Data rows
     for i, data in enumerate(dataArray):
         line = asTableRow(data, template, delim, edgeDelim) + "\n"
         tableString += line if i % 2 != 0 else wrapColor(line, color = alternateRowColor)
+        tableString += (rowSpacer + "\n") if includeRowDividers else ""
         
-    return tableString 
+    return tableString
 
 def printLists(data: List[List[str]], titles: List[str]) -> bool:
     """
