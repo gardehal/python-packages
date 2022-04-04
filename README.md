@@ -16,8 +16,7 @@
 
 ## TODO
 
-- astable, look though dataArray and find longest instance for each column, send as argument to astablerow as maxwidth or something
-- prinutil as table/row, use + in corners, optional alter different colour on rows, input as columns, not just rows, option to use deviding rows
-- base class for service
+- asTable by column
+- asTable left-adjust text (default), center text, right-adjust text in cells
 - update old methods with proper docstrings
 - import more common functions/exceptions

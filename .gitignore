@@ -120,3 +120,5 @@ dmypy.json
 
 # Custom
 */Main.py
+**test
+**/test*
