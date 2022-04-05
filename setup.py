@@ -4,12 +4,12 @@ import setuptools
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
 setuptools.setup(name="grdUtil",
-version="1.2.0",
+version="1.3.0",
 description="Various Python utility methods, printing, input handling, colouring text in Bash, and more.",
 url="https://github.com/grdall/python-packages",
 author="grdAll",
 install_requires=REQUIREMENTS,
 author_email="",
-packages=["grdUtil", "grdExceptions"],
+packages=["grdUtil", "grdException", "grdService"],
 license="MIT",
 zip_safe=False)
