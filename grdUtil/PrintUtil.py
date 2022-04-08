@@ -2,6 +2,7 @@ import os
 import sys
 import threading
 import time
+import traceback
 from typing import List
 from grdExceptions.ArgumentException import ArgumentException
 
@@ -268,7 +269,7 @@ def runFunctionWithSpinner(function: any, arguments: tuple[()]) -> None:
 
     Args:
         function (method): [description]
-        arguments (tuple[): [description]
+        arguments (tuple): [description]
     """
     
     funcThread = threading.Thread(target = function, args = arguments)
@@ -276,3 +277,15 @@ def runFunctionWithSpinner(function: any, arguments: tuple[()]) -> None:
     
     while funcThread.is_alive():
         printSpinner()
+
+def printStack(color: BashColor = BashColor.WARNING, doPrint: bool = True) -> None:
+    """
+    Prints traceback.format_exec() in a wrapper. Used to print error inside try/except except. 
+    If used outside an except block, it will print "NoneType = None\n\n" without any colour.
+
+    Args:
+        color (BashColor): BashColor to use for print. Default BashColor.WARNING.
+        doPrint (bool): Should print? E.g. if debug == True. Default True.
+    """
+    
+    printS(traceback.format_exc(), color = color, doPrint = doPrint)
