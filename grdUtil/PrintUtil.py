@@ -281,7 +281,7 @@ def runFunctionWithSpinner(function: any, arguments: tuple[()]) -> None:
 def printStack(color: BashColor = BashColor.WARNING, doPrint: bool = True) -> None:
     """
     Prints traceback.format_exec() in a wrapper. Used to print error inside try/except except. 
-    If used outside an except block, it will print "NoneType = None\n\n" without any colour.
+    If used outside an except block, it will print "NoneType = None\n\n".
 
     Args:
         color (BashColor): BashColor to use for print. Default BashColor.WARNING.
