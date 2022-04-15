@@ -32,7 +32,6 @@ class JsonUtil:
                 for item in val:
                     element.append(JsonUtil.toDict(item))
             elif(isinstance(val, enum.Enum)):
-                print("enum")
                 element = val.value
             else:
                 element = JsonUtil.toDict(val)
