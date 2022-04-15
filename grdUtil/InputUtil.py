@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import re
 from typing import List
@@ -155,3 +156,31 @@ def sanitize(*args, mode: int = 1) -> str:
             _result += re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", "", _element)
             
     return _result
+
+def stringToDatetime(toConvert: str, format: str = "%Y-%m-%d %H:%M:%S.%f") -> datetime:
+    """
+    Parses string to datetime.
+
+    Args:
+        toConvert (str): String of date or time or datetime to convert.
+        format (str, optional): DateTime format to use. Defaults to %Y-%m-%d %H:%M:%S.%f e.g. 2020-12-31 23:59:59.999999, same format as datetime.now().
+
+    Returns:
+        datetime: datetime result
+    """
+    
+    return datetime.strptime(toConvert, format)
+
+def datetimeToString(toConvert: datetime, format: str = "%Y-%m-%d %H:%M:%S.%f") -> str:
+    """
+    Parses datetime to string.
+
+    Args:
+        toConvert (datetime): String of date or time or datetime to convert.
+        format (str, optional): DateTime format to use. Defaults to %Y-%m-%d %H:%M:%S.%f e.g. 2020-12-31 23:59:59.999999, same format as datetime.now().
+
+    Returns:
+        datetime: datetime result
+    """
+    
+    return toConvert.strftime(format)
