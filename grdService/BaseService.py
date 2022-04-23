@@ -6,7 +6,7 @@ from grdUtil.BashColor import BashColor
 from grdUtil.LocalJsonRepository import LocalJsonRepository
 from grdUtil.PrintUtil import printS
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class BaseService(Generic[T]):
@@ -59,10 +59,17 @@ class BaseService(Generic[T]):
         """
 
         entity = entity
-        entity.id = str(uuid.uuid4())
         
-        result = self.entityRepository.add(entity)
-        if(result):
+        if(hasattr(entity, "id") and entity.id == None):
+            entity.id = str(uuid.uuid4())
+        if(hasattr(entity, "added") and entity.added == None):
+            entity.added = datetime.now()
+        if(hasattr(entity, "created") and entity.created == None):
+            entity.created = datetime.now()
+        if(hasattr(entity, "updated") and entity.updated == None):
+            entity.updated = datetime.now()
+        
+        if(self.entityRepository.add(entity)):
             return entity
         else:
             return None
@@ -81,7 +88,7 @@ class BaseService(Generic[T]):
 
         entity = self.entityRepository.get(id)
         
-        if(entity != None and entity.deleted != None and not includeSoftDeleted):
+        if(hasattr(entity, "deleted") and entity != None and entity.deleted != None and not includeSoftDeleted):
             printS("DEBUG: get - Entity with ID ", entity.id, " was soft deleted.", color = BashColor.WARNING, doPrint = self.debug)
             return None
         else:
@@ -102,7 +109,7 @@ class BaseService(Generic[T]):
         result = []
         
         for entity in entities:
-            if(entity.deleted != None and not includeSoftDeleted):
+            if(hasattr(entity, "deleted") and entity.deleted != None and not includeSoftDeleted):
                 printS("DEBUG: getAll - Entity with ID ", entity.id, " was soft deleted.", color = BashColor.WARNING, doPrint = self.debug)
             else:
                 result.append(entity)
@@ -134,11 +141,10 @@ class BaseService(Generic[T]):
             T | None: T if success, else None.
         """
 
-        entity = entity
-        entity.updated = datetime.now()
+        if(hasattr(entity, "updated")):
+            entity.updated = datetime.now()
         
-        result = self.entityRepository.update(entity)
-        if(result):
+        if(self.entityRepository.update(entity)):
             return entity
         else:
             return None
@@ -158,9 +164,10 @@ class BaseService(Generic[T]):
         if(entity == None):
             return None
 
-        entity.deleted = datetime.now()
-        result = self.update(entity)
-        if(result):
+        if(hasattr(entity, "deleted")):
+            entity.deleted = datetime.now()
+            
+        if(self.update(entity)):
             return entity
         else:
             return None
@@ -180,9 +187,10 @@ class BaseService(Generic[T]):
         if(entity == None):
             return None
 
-        entity.deleted = None
-        result = self.update(entity)
-        if(result):
+        if(hasattr(entity, "deleted")):
+            entity.deleted = None
+        
+        if(self.update(entity)):
             return entity
         else:
             return None
@@ -203,8 +211,7 @@ class BaseService(Generic[T]):
         if(entity == None):
             return None
         
-        result = self.entityRepository.remove(entity.id)
-        if(result):
+        if(self.entityRepository.remove(entity.id)):
             return entity
         else:
             return None
