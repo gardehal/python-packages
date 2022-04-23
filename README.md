@@ -16,7 +16,9 @@
 
 ## TODO
 
+- logutil, with log level and option to also print
 - asTable by column
 - asTable left-adjust text (default), center text, right-adjust text in cells
 - update old methods with proper docstrings
 - import more common functions/exceptions
+- grdException vs grdExceptions - with S is wrong but not mentioned anywhere? chahce issue, attempted to delete all packages but still there?
