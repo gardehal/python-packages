@@ -23,12 +23,13 @@ def enablePrint():
     """
     sys.stdout = sys.__stdout__
 
-def printS(*args, color = None, doPrint: bool = True) -> None:
+def printS(*args: any, color: BashColor = None, doPrint: bool = True) -> None:
     """
     Concats all arguments and prints them as string (delim not included).
 
     Args:
-        color ([type], optional): Color from colors-dictionary. Defaults to None (normal color).
+        args (any): Items to print.
+        color (BashColor, optional): Color from colors-dictionary. Defaults to None (normal color).
         doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
     """
     
