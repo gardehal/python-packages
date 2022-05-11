@@ -5,7 +5,7 @@ from typing import Generic, List, TypeVar
 
 from grdUtil.BashColor import BashColor
 from grdUtil.FileUtil import mkdir
-from grdUtil.PrintUtil import printS
+from grdUtil.PrintUtil import printS, printStack
 
 from .JsonUtil import *
 
@@ -52,6 +52,27 @@ class LocalJsonRepository(Generic[T]):
         except Exception:
             if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
             printS("Error adding ", entity.id, color = BashColor.FAIL)
+            return False
+
+    def exists(self, id: str) -> bool:
+        """
+        Check if entity exists by ID.
+
+        Args:
+            id (str): id of entity to get
+
+        Returns:
+            bool: exists
+        """
+
+        try:
+            _filename = id + ".json"
+            _path = os.path.join(self.storagePath, _filename)
+            if(not os.path.isfile(_path)):
+                return True
+            return False
+        except Exception:
+            printStack(doPrint = self.debug)
             return False
 
     def get(self, id: str) -> T:

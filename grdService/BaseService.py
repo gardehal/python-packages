@@ -46,7 +46,7 @@ class BaseService(Generic[T]):
         self.storagePath = storagePath
         self.debug = debug
         self.entityRepository: LocalJsonRepository = LocalJsonRepository(typeT, self.debug, self.storagePath)
-
+        
     def add(self, entity: T) -> T:
         """
         Add a new entity T.
@@ -74,6 +74,19 @@ class BaseService(Generic[T]):
         else:
             return None
 
+    def exists(self, id: str) -> bool:
+        """
+        Check if entity exists by ID.
+
+        Args:
+            id (str): id of entity to get
+
+        Returns:
+            bool: exists
+        """
+
+        return self.entityRepository.exists(id)
+        
     def get(self, id: str, includeSoftDeleted: bool = False) -> T:
         """
         Get entity T by ID.
