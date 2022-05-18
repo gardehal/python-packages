@@ -101,7 +101,7 @@ class BaseService(Generic[T]):
 
         entity = self.entityRepository.get(id)
         
-        if(hasattr(entity, "deleted") and entity != None and entity.deleted != None and not includeSoftDeleted):
+        if(not includeSoftDeleted and hasattr(entity, "deleted") and entity != None and entity.deleted != None):
             printS("DEBUG: get - Entity with ID ", entity.id, " was soft deleted.", color = BashColor.WARNING, doPrint = self.debug)
             return None
         else:
@@ -122,7 +122,7 @@ class BaseService(Generic[T]):
         result = []
         
         for entity in entities:
-            if(hasattr(entity, "deleted") and entity.deleted != None and not includeSoftDeleted):
+            if(not includeSoftDeleted and hasattr(entity, "deleted") and entity.deleted != None):
                 printS("DEBUG: getAll - Entity with ID ", entity.id, " was soft deleted.", color = BashColor.WARNING, doPrint = self.debug)
             else:
                 result.append(entity)
