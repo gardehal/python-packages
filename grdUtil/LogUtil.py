@@ -1,9 +1,5 @@
 
-import inspect
-
-from .BashColor import BashColor
 from .LogLevel import LogLevel
-from .PrintUtil import printS
 
 
 class LogUtil():
@@ -29,51 +25,30 @@ class LogUtil():
         
         return logLevel > self.logLevel
         
-    def printS(self, *args, color: BashColor = None, doPrint: bool = True) -> None:
+    def logAsJson(self, object: any, logLevel: LogLevel = self.logLevel, doPrint: bool = False) -> str:
         """
-        Concats all arguments and prints them as string (delim not included).
+        Log argument object as JSON to file in path self.logPath.
 
         Args:
-            args (any): Items to print.
-            color (BashColor, optional): Color from colors-dictionary. Defaults to None (normal color).
-            doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
+            object (any): Object to log. Suggested to wrap your actual object in LogObject.
+            logLevel (LogLevel, optional): LogLevel to log as. Defaults to self.logLevel.
+            doPrint (bool, optional): Should log result be printed to print(). Defaults to False.
+
+        Returns:
+            str: Assembled string logged.
         """
-        
-        # It loglevel not matched
-        # if(???): 
-        #     return None
-        
-        return printS(*args, color = color, doPrint = doPrint)
-        
-    def printD(self, *args, color: BashColor = BashColor.WARNING, debug: bool = True) -> None:
+        return None
+
+    def logAsText(self, *args: any, logLevel: LogLevel = self.logLevel, doPrint: bool = False) -> str:
         """
-        Concats all arguments and prints them as string (delim not included) in a DEBUG format.
-        
-        Format: "DEBUG: MethodName - Message."
+        Log arguments arg to file in path self.logPath.
 
         Args:
-            color (BashColor, optional): Color from colors-dictionary. Defaults to None (normal color).
-            doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
-        """
-        
-        # It loglevel not matched
-        # if(???):
-        #     return None
-        
-        currentFrame = inspect.currentframe()
-        callerFrame = inspect.getouterframes(currentFrame, 2)
-        parentMethodName = callerFrame[1][3]
-        
-        return printS("DEBUG: ", parentMethodName, " - ", *args, color = color, doPrint = debug)
-        
-    def logToJson(self, toLog: str, logLevel: LogLevel, doPrint: bool = False) -> bool:
-        """
-        Log a string to a file as JSON.
-        """
-        return True
+            *args (any): Object to log. These will be concat to a string.
+            logLevel (LogLevel, optional): LogLevel to log as. Defaults to self.logLevel.
+            doPrint (bool, optional): Should log result be printed to print(). Defaults to False.
 
-    def logToFile(self, toLog: any, logLevel: LogLevel, doPrint: bool = False) -> bool:
+        Returns:
+            str: Assembled string logged.
         """
-        Log a string to a file as plain text.
-        """
-        return True
+        return None
