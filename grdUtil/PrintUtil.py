@@ -1,3 +1,4 @@
+import inspect
 import os
 import sys
 import threading
@@ -45,6 +46,23 @@ def printS(*args: any, color: BashColor = None, doPrint: bool = True) -> None:
 
     print(_message)
     return None
+        
+def printD(*args, color: BashColor = BashColor.WARNING, debug: bool = True) -> None:
+    """
+    Concats all arguments and prints them as string (delim not included) in a DEBUG format.
+    
+    Format: "DEBUG: MethodName - Message."
+
+    Args:
+        color (BashColor, optional): Color from colors-dictionary. Defaults to None (normal color).
+        doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
+    """
+    
+    currentFrame = inspect.currentframe()
+    callerFrame = inspect.getouterframes(currentFrame, 2)
+    parentMethodName = callerFrame[1][3]
+    
+    return printS("DEBUG: ", parentMethodName, " - ", *args, color = color, doPrint = debug)
 
 def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
     """
