@@ -1,10 +1,12 @@
 
-from BashColor import BashColor
-from build.lib.grdUtil.PrintUtil import printS
-from grdUtil.ShellUtil import *
-from LogLevel import LogLevel
+import inspect
 
-class FileLogger():
+from .BashColor import BashColor
+from .LogLevel import LogLevel
+from .PrintUtil import printS
+
+
+class LogUtil():
     logPath: str
     debug: bool
     logLevel: LogLevel
@@ -14,7 +16,20 @@ class FileLogger():
         self.debug = debug
         self.logLevel = logLevel
         
-    def printS(*args, color: BashColor = None, doPrint: bool = True) -> None:
+    def shouldLog(self, logLevel: LogLevel) -> bool:
+        """
+        Should items be logged/printed based on log level.
+
+        Args:
+            logLevel (LogLevel): current LogLevel.
+
+        Returns:
+            bool: items should be logged and printed
+        """
+        
+        return logLevel > self.logLevel
+        
+    def printS(self, *args, color: BashColor = None, doPrint: bool = True) -> None:
         """
         Concats all arguments and prints them as string (delim not included).
 
@@ -28,11 +43,13 @@ class FileLogger():
         # if(???): 
         #     return None
         
-        return printS(args, color = color, doPrint = doPrint)
+        return printS(*args, color = color, doPrint = doPrint)
         
-    def printD(*args, color: BashColor = BashColor.WARNING, debug: bool = True) -> None:
+    def printD(self, *args, color: BashColor = BashColor.WARNING, debug: bool = True) -> None:
         """
         Concats all arguments and prints them as string (delim not included) in a DEBUG format.
+        
+        Format: "DEBUG: MethodName - Message."
 
         Args:
             color (BashColor, optional): Color from colors-dictionary. Defaults to None (normal color).
@@ -43,16 +60,19 @@ class FileLogger():
         # if(???):
         #     return None
         
-        # TODO get method name of caller
-        return printS("DEBUG: ", args, color = color, doPrint = debug)
+        currentFrame = inspect.currentframe()
+        callerFrame = inspect.getouterframes(currentFrame, 2)
+        parentMethodName = callerFrame[1][3]
         
-    def logToJson(toLog: str, logLevel: LogLevel, doPrint: bool = False) -> bool:
+        return printS("DEBUG: ", parentMethodName, " - ", *args, color = color, doPrint = debug)
+        
+    def logToJson(self, toLog: str, logLevel: LogLevel, doPrint: bool = False) -> bool:
         """
         Log a string to a file as JSON.
         """
         return True
 
-    def logToFile(toLog: any, logLevel: LogLevel, doPrint: bool = False) -> bool:
+    def logToFile(self, toLog: any, logLevel: LogLevel, doPrint: bool = False) -> bool:
         """
         Log a string to a file as plain text.
         """
