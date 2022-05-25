@@ -23,4 +23,6 @@
 - import more common functions/exceptions
 - grdException vs grdExceptions - with S is wrong but not mentioned anywhere? chahce issue, attempted to delete all packages but still there?
 - debug print, if it can automatically get the name of calling function, use printS default warning, debug arg, format: "DEBUG: func - message"
-update debugs in try/catch with printStack (e.g. jsonRepo)
+- update debugs in try/catch with printStack (e.g. jsonRepo)
+- do something so colors show in MS cmd, powershell, etc.
+- remove _ in _varName
