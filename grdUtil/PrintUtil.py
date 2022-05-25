@@ -5,11 +5,12 @@ import threading
 import time
 import traceback
 from typing import List
+
 from grdException.ArgumentException import ArgumentException
 
 from grdUtil.BashColor import BashColor
 from grdUtil.ShellType import ShellType
-from grdUtil.ShellUtil import *
+from grdUtil.ShellUtil import getCurrentShellType
 
 
 def disablePrint():
@@ -26,35 +27,32 @@ def enablePrint():
 
 def printS(*args: any, color: BashColor = None, doPrint: bool = True) -> None:
     """
-    Concats all arguments and prints them as string (delim not included).
+    Concat all arguments and prints them as string (delim not included).
 
     Args:
         args (any): Items to print.
-        color (BashColor, optional): Color from colors-dictionary. Defaults to None (normal color).
+        color (BashColor, optional): Color from colors-dictionary. Defaults to None (no color).
         doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
     """
     
     if(not doPrint):
         return None
     
-    _message = ""
-    for _element in args:
-        _message += str(_element)
-
+    message = [str(m) for m in args]
     if(color):
-        _message = wrapColor(_message, color)
+        message = wrapColor(message, color)
 
-    print(_message)
+    print(message)
     return None
         
 def printD(*args, color: BashColor = BashColor.WARNING, debug: bool = True) -> None:
     """
-    Concats all arguments and prints them as string (delim not included) in a DEBUG format.
+    Concat all arguments and prints them as string (delim not included) in a DEBUG format.
     
     Format: "DEBUG: MethodName - Message."
 
     Args:
-        color (BashColor, optional): Color from colors-dictionary. Defaults to None (normal color).
+        color (BashColor, optional): Color from colors-dictionary. Defaults to None (no color).
         doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
     """
     
@@ -76,17 +74,17 @@ def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
         overrideColor (str): a string with the color to use, custom set, like "\\x1b[0;34;42m"
 
     Returns:
-        str: input text wrapped in the ASCII colours
+        str: Input text wrapped in the ASCII colors.
     """
     
     if(getCurrentShellType() != ShellType.BASH):
         return text
     
-    _color = color.value
+    color = color.value
     if(overrideColor != None and str(overrideColor[0]) == "\x1b"):
-        _color = color
+        color = color
 
-    return _color + str(text) + BashColor.ENDC.value
+    return color + str(text) + BashColor.ENDC.value
 
 def getMaxColumWidth(dataArray: List[List[str]], labels: List[str], paddingSpace: int = 2) -> List[int]:
     """
@@ -98,7 +96,7 @@ def getMaxColumWidth(dataArray: List[List[str]], labels: List[str], paddingSpace
         paddingSpace (int): Length of padding space to take into account, eg. "foo" = 0, " bar " = 2.
 
     Returns:
-        List[int]: widths of the widest strings per column
+        List[int]: Widths of the widest strings per column.
     """
     
     if(not isinstance(dataArray, List) or not isinstance(dataArray[0], List)):
@@ -131,7 +129,7 @@ def getRowSpacer(templateArray: List[int], corner: str = "+", spacer: str = "-",
         edgeDelim (bool, optional): Should include startin deliminator? Defaults to False.
 
     Returns:
-        str: row spacer
+        str: Row spacer.
     """
 
     row = corner if edgeDelim else ""
@@ -153,7 +151,7 @@ def asTableRow(dataArray: List[str], templateArray: List[int], delim: str = " | 
         edgeDelim (bool, optional): Should include startin deliminator? Defaults to False.
 
     Returns:
-        str: dataArray as a row
+        str: dataArray as a row.
     """
     
     row = delim if edgeDelim else ""
@@ -176,14 +174,14 @@ def asTable(dataArray: List[List[str]], labels: List[str], delim: str = "|",
     Args:
         dataArray (List[List[str]]): 2D List of Lists of rows to put in table.
         labels (List[str], optional): 1D List of labels per column, also used as template for width of columns.
-        minColWidth (int, optional): Mimimum column width. Defaults to 6.
+        minColWidth (int, optional): Minimum column width. Defaults to 6.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
         edgeDelim (bool, optional): Should include start and end deliminator? Defaults to False.
         includeRowDividers(bool, optional): Should string include dividers between each row? Defaults to False.
         alternateRowColor(bool, optional): BashColor to use on alternate rows. Defaults to BashColor.NONE.
 
     Returns:
-        str: dataArray and labels as a table
+        str: dataArray and labels as a table.
     """
     
     if(not isinstance(dataArray, List) or not isinstance(dataArray[0], List)):
@@ -218,7 +216,7 @@ def printLists(data: List[List[str]], titles: List[str]) -> bool:
         titles (List[str]): List of titles, index 0 is title for data List index 0 etc.
 
     Returns:
-        bool: true = success
+        bool: Result.
     """
     
     for i, dataList in enumerate(data):
