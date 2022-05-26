@@ -1,6 +1,6 @@
 import glob
+import json
 import os
-import sys
 from typing import Generic, TypeVar
 
 from .BashColor import BashColor
@@ -49,8 +49,7 @@ class LocalJsonRepository(Generic[T]):
 
             return True
         except Exception:
-            if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
-            printS("Error adding ", entity.id, color = BashColor.FAIL)
+            printStack(doPrint = self.debug)
             return False
 
     def exists(self, id: str) -> bool:
@@ -97,8 +96,7 @@ class LocalJsonRepository(Generic[T]):
             else:
                 return fromJson(fileContent, self.typeT)
         except Exception:
-            if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
-            printS("Error getting", color = BashColor.FAIL)
+            printStack(doPrint = self.debug)
             return None
 
     def getAll(self) -> list[T]:
@@ -122,8 +120,7 @@ class LocalJsonRepository(Generic[T]):
             
             return all
         except Exception:
-            if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
-            printS("Error getting all", color = BashColor.FAIL)
+            printStack(doPrint = self.debug)
             return list[T]
 
     def update(self, entity: T) -> bool:
@@ -151,8 +148,7 @@ class LocalJsonRepository(Generic[T]):
             
             return True
         except Exception:
-            if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
-            printS("Error updating ", entity.id, color = BashColor.FAIL)
+            printStack(doPrint = self.debug)
             return False
 
     def remove(self, id: str) -> bool:
@@ -178,6 +174,5 @@ class LocalJsonRepository(Generic[T]):
             
             return True
         except Exception:
-            if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
-            printS("Error removing ", id, color = BashColor.FAIL)
+            printStack(doPrint = self.debug)
             return False
