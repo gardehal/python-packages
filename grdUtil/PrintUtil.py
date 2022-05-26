@@ -38,7 +38,7 @@ def printS(*args: any, color: BashColor = None, doPrint: bool = True) -> None:
     if(not doPrint):
         return None
     
-    message = [str(m) for m in args]
+    message = "".join([str(m) for m in args])
     if(color):
         message = wrapColor(message, color)
 
