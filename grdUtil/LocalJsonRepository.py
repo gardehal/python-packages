@@ -35,17 +35,17 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        _entity = self.get(entity.id)
-        if(_entity != None):
+        entity = self.get(entity.id)
+        if(entity != None):
             if(self.debug): printS("Error adding ", entity.id, ", ID already exists", color = BashColor.FAIL)
             return False
 
         try:
-            _newEntityDict = toDict(entity)
-            _filename = entity.id + ".json"
-            _path = os.path.join(self.storagePath, _filename)
-            with open(_path, "a") as file:
-                json.dump(_newEntityDict, file, indent=4, default=str)
+            newEntityDict = toDict(entity)
+            fileName = entity.id + ".json"
+            filePath = os.path.join(self.storagePath, fileName)
+            with open(filePath, "a") as file:
+                json.dump(newEntityDict, file, indent=4, default=str)
 
             return True
         except Exception:
@@ -83,19 +83,19 @@ class LocalJsonRepository(Generic[T]):
         """
 
         try:
-            _filename = id + ".json"
-            _path = os.path.join(self.storagePath, _filename)
-            if(not os.path.isfile(_path)):
+            fileName = id + ".json"
+            filePath = os.path.join(self.storagePath, fileName)
+            if(not os.path.isfile(filePath)):
                 return None
 
-            _fileContent = None
-            with open(_path, "r") as file:
-                _fileContent = file.read()
+            fileContent = None
+            with open(filePath, "r") as file:
+                fileContent = file.read()
             
-            if(len(_fileContent) < 2):
+            if(len(fileContent) < 2):
                 return None
             else:
-                return fromJson(_fileContent, self.typeT)
+                return fromJson(fileContent, self.typeT)
         except Exception:
             if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
             printS("Error getting", color = BashColor.FAIL)
@@ -110,17 +110,17 @@ class LocalJsonRepository(Generic[T]):
         """
 
         try:
-            _all = []
-            _globPath = glob.glob(f"{self.storagePath}/*.json")
-            for _path in _globPath:
-                _fileContent = None
-                with open(_path, "r") as file:
-                    _fileContent = file.read()
+            all = []
+            globPath = glob.glob(f"{self.storagePath}/*.json")
+            for filePath in globPath:
+                fileContent = None
+                with open(filePath, "r") as file:
+                    fileContent = file.read()
 
-                if(len(_fileContent) > 2):
-                    _all.append(fromJson(_fileContent, self.typeT))
+                if(len(fileContent) > 2):
+                    all.append(fromJson(fileContent, self.typeT))
             
-            return _all
+            return all
         except Exception:
             if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
             printS("Error getting all", color = BashColor.FAIL)
@@ -137,17 +137,17 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        _entity = self.get(entity.id)
-        if(_entity == None):
+        entity = self.get(entity.id)
+        if(entity == None):
             printS("Error updating ", entity.id, ", entity does not exist", color = BashColor.FAIL)
             return False
 
         try:
-            _updatedEntityDict = toDict(entity)
-            _filename = _entity.id + ".json"
-            _path = os.path.join(self.storagePath, _filename)
-            with open(_path, "w") as file:
-                json.dump(_updatedEntityDict, file, indent=4, default=str)
+            updatedEntityDict = toDict(entity)
+            fileName = entity.id + ".json"
+            filePath = os.path.join(self.storagePath, fileName)
+            with open(filePath, "w") as file:
+                json.dump(updatedEntityDict, file, indent=4, default=str)
             
             return True
         except Exception:
@@ -166,14 +166,14 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        _entity = self.get(id)
-        if(_entity == None):
+        entity = self.get(id)
+        if(entity == None):
             printS("Error removing ", id, ", entity does not exist", color = BashColor.FAIL)
             return False
 
         try:
-            _filename = _entity.id + ".json"
-            path = os.path.join(self.storagePath, _filename)
+            filename = entity.id + ".json"
+            path = os.path.join(self.storagePath, filename)
             os.remove(path)
             
             return True
