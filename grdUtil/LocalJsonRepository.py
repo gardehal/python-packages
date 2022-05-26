@@ -1,7 +1,7 @@
 import glob
 import os
 import sys
-from typing import Generic, List, TypeVar
+from typing import Generic, TypeVar
 
 from .BashColor import BashColor
 from .FileUtil import mkdir
@@ -29,10 +29,10 @@ class LocalJsonRepository(Generic[T]):
         Add a new entity using local JSON files for storage.
 
         Args:
-            entity (T): entity to add
+            entity (T): Entity to add.
 
         Returns:
-            bool: success = True
+            bool: Result.
         """
 
         _entity = self.get(entity.id)
@@ -58,10 +58,10 @@ class LocalJsonRepository(Generic[T]):
         Check if entity exists by ID.
 
         Args:
-            id (str): id of entity to get
+            id (str): ID of entity to check.
 
         Returns:
-            bool: exists
+            bool: Exists.
         """
 
         try:
@@ -76,10 +76,10 @@ class LocalJsonRepository(Generic[T]):
         Get entity using local JSON files for storage.
 
         Args:
-            id (str): id of entity to get
+            id (str): ID of entity to get.
 
         Returns:
-            T: entity if any, else None
+            T: Entity if any, else None.
         """
 
         try:
@@ -101,12 +101,12 @@ class LocalJsonRepository(Generic[T]):
             printS("Error getting", color = BashColor.FAIL)
             return None
 
-    def getAll(self) -> List[T]:
+    def getAll(self) -> list[T]:
         """
         Get all entities using local JSON files for storage.
 
         Returns:
-            List[T]: entities if any, else empty list
+            list[T]: Entities if any, else empty list.
         """
 
         try:
@@ -124,17 +124,17 @@ class LocalJsonRepository(Generic[T]):
         except Exception:
             if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
             printS("Error getting all", color = BashColor.FAIL)
-            return List[T]
+            return list[T]
 
     def update(self, entity: T) -> bool:
         """
         Update entity using local JSON files for storage.
 
         Args:
-            entity (T): entity to update
+            entity (T): Entity to update.
 
         Returns:
-            bool: success = True
+            bool: Result.
         """
 
         _entity = self.get(entity.id)
@@ -160,15 +160,15 @@ class LocalJsonRepository(Generic[T]):
         Remove entity using local JSON files for storage.
 
         Args:
-            id (str): id of entity to remove
+            id (str): ID of entity to remove.
 
         Returns:
-            bool: success = True
+            bool: Result.
         """
 
         _entity = self.get(id)
         if(_entity == None):
-            printS("Error removeing ", id, ", entity does not exist", color = BashColor.FAIL)
+            printS("Error removing ", id, ", entity does not exist", color = BashColor.FAIL)
             return False
 
         try:
