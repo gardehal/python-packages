@@ -66,9 +66,8 @@ class LocalJsonRepository(Generic[T]):
         """
 
         try:
-            filename = id + ".json"
-            path = os.path.join(self.storagePath, filename)
-            return os.path.isfile(path)
+            filename = "".join(id, ".json")
+            return os.path.isfile(os.path.join(self.storagePath, filename))
         except Exception:
             printStack(doPrint = self.debug)
             return False
