@@ -5,7 +5,7 @@ import os
 import time
 
 from .FileUtil import mkdir
-from .JsonUtil import toDict
+from .JsonUtil import JsonUtil
 from .LogLevel import LogLevel
 
 
@@ -102,7 +102,7 @@ class LogUtil():
         if(not self.shouldLog(validLogLevel)):
             return None
         
-        log = toDict(entity)
+        log = JsonUtil.toDict(entity)
         logResult = self.writeLog(log)
         if(not logResult):
             return None
