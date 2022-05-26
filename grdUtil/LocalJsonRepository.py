@@ -3,11 +3,10 @@ import os
 import sys
 from typing import Generic, List, TypeVar
 
-from grdUtil.BashColor import BashColor
-from grdUtil.FileUtil import mkdir
-from grdUtil.PrintUtil import printS, printStack
-
-from .JsonUtil import *
+from .BashColor import BashColor
+from .FileUtil import mkdir
+from .JsonUtil import fromJson, toDict
+from .PrintUtil import printS, printStack
 
 T = TypeVar("T")
 
@@ -42,7 +41,7 @@ class LocalJsonRepository(Generic[T]):
             return False
 
         try:
-            _newEntityDict = JsonUtil.toDict(entity)
+            _newEntityDict = toDict(entity)
             _filename = entity.id + ".json"
             _path = os.path.join(self.storagePath, _filename)
             with open(_path, "a") as file:
@@ -96,7 +95,7 @@ class LocalJsonRepository(Generic[T]):
             if(len(_fileContent) < 2):
                 return None
             else:
-                return JsonUtil.fromJson(_fileContent, self.typeT)
+                return fromJson(_fileContent, self.typeT)
         except Exception:
             if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
             printS("Error getting", color = BashColor.FAIL)
@@ -119,7 +118,7 @@ class LocalJsonRepository(Generic[T]):
                     _fileContent = file.read()
 
                 if(len(_fileContent) > 2):
-                    _all.append(JsonUtil.fromJson(_fileContent, self.typeT))
+                    _all.append(fromJson(_fileContent, self.typeT))
             
             return _all
         except Exception:
@@ -144,7 +143,7 @@ class LocalJsonRepository(Generic[T]):
             return False
 
         try:
-            _updatedEntityDict = JsonUtil.toDict(entity)
+            _updatedEntityDict = toDict(entity)
             _filename = _entity.id + ".json"
             _path = os.path.join(self.storagePath, _filename)
             with open(_path, "w") as file:
@@ -180,5 +179,5 @@ class LocalJsonRepository(Generic[T]):
             return True
         except Exception:
             if(self.debug): printS(sys.exc_info(), color = BashColor.WARNING)
-            printS("Error removeing ", id, color = BashColor.FAIL)
+            printS("Error removing ", id, color = BashColor.FAIL)
             return False
