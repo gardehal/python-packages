@@ -25,6 +25,5 @@
 - debug print, if it can automatically get the name of calling function, use printS default warning, debug arg, format: "DEBUG: func - message"
 - update debugs in try/catch with printStack (e.g. jsonRepo)
 - do something so colors show in MS cmd, powershell, etc.
-- remove _ in _varName
 - import still weird, should be .PrintUtil, not grdUtil.PrintUtil but doesn't always work..
 - delete WebUtil?
