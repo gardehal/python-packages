@@ -1,7 +1,7 @@
 import os
 
-from grdUtil.BashColor import BashColor
-from grdUtil.PrintUtil import printS
+from .BashColor import BashColor
+from .PrintUtil import printS
 
 
 def mkdir(dirPath) -> None:

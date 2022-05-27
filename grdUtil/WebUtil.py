@@ -3,7 +3,7 @@ import time
 import requests
 from furl import furl
 
-from grdUtil.HttpVerb import HttpVerb
+from .HttpVerb import HttpVerb
 
 
 def requestCallByUrl(url, verb, body = None, headers = None, retries = 4, timeout = 4, stream = False):

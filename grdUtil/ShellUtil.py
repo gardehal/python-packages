@@ -2,7 +2,7 @@ import os
 
 import psutil
 
-from grdUtil.ShellType import ShellType
+from .ShellType import ShellType
 
 
 def getCurrentShellType() -> ShellType:
@@ -10,7 +10,7 @@ def getCurrentShellType() -> ShellType:
     Gets type fo current shell (Windows CMD, PowerShell, Bash...).
     
     Returns:
-        ShellType: type of shell else None
+        ShellType: type of shell else None.
     """
     
     _cliName = psutil.Process(os.getppid()).name().lower()
