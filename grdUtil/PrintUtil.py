@@ -5,7 +5,7 @@ import threading
 import time
 import traceback
 
-from ..grdException.ArgumentException import ArgumentException
+from grdException.ArgumentException import ArgumentException
 from .BashColor import BashColor
 from .ShellType import ShellType
 from .ShellUtil import getCurrentShellType
