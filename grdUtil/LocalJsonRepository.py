@@ -3,7 +3,6 @@ import json
 import os
 from typing import Generic, TypeVar
 
-from .BashColor import BashColor
 from .FileUtil import mkdir
 from .JsonUtil import fromJson, toDict
 from .PrintUtil import printD, printStack
@@ -35,14 +34,14 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        storedEntity = self.get(entity.id)
-        if(storedEntity != None):
-            printD("Error adding ", storedEntity.id, ", ID already exists", color = BashColor.FAIL, debug = self.debug)
+        entityExists = self.exists(entity.id)
+        if(entityExists):
+            printD("Error adding ", entity.id, ", ID already exists", debug = self.debug)
             return False
 
         try:
             newEntityDict = toDict(entity)
-            fileName = entity.id + ".json"
+            fileName = "".join([entity.id, ".json"])
             filePath = os.path.join(self.storagePath, fileName)
             with open(filePath, "a") as file:
                 json.dump(newEntityDict, file, indent=4, default=str)
@@ -64,7 +63,7 @@ class LocalJsonRepository(Generic[T]):
         """
 
         try:
-            filename = "".join(id, ".json")
+            filename = "".join([id, ".json"])
             return os.path.isfile(os.path.join(self.storagePath, filename))
         except Exception:
             printStack(doPrint = self.debug)
@@ -82,7 +81,7 @@ class LocalJsonRepository(Generic[T]):
         """
 
         try:
-            fileName = id + ".json"
+            fileName = "".join([id, ".json"])
             filePath = os.path.join(self.storagePath, fileName)
             if(not os.path.isfile(filePath)):
                 return None
@@ -134,16 +133,16 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        storedEntity = self.get(entity.id)
-        if(storedEntity != None):
-            printD("Error updating ", storedEntity.id, ", entity does not exist.", color = BashColor.FAIL, debug = self.debug)
+        entityExists = self.exists(entity.id)
+        if(not entityExists):
+            printD("Error updating ", entity.id, ", entity does not exist.", debug = self.debug)
             return False
 
         try:
             updatedEntityDict = toDict(entity)
-            fileName = entity.id + ".json"
+            fileName = "".join([entity.id, ".json"])
             filePath = os.path.join(self.storagePath, fileName)
-            with open(filePath, "w") as file:
+            with open(filePath, "w") as file: # w truncates
                 json.dump(updatedEntityDict, file, indent=4, default=str)
             
             return True
@@ -162,14 +161,14 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        storedEntity = self.get(id)
-        if(storedEntity != None):
-            printD("Error removing ", id, ", entity does not exist", color = BashColor.FAIL, debug = self.debug)
+        entityExists = self.exists(id)
+        if(not entityExists):
+            printD("Error removing ", id, ", entity does not exist", debug = self.debug)
             return False
 
         try:
-            filename = storedEntity.id + ".json"
-            path = os.path.join(self.storagePath, filename)
+            fileName = "".join([id, ".json"])
+            path = os.path.join(self.storagePath, fileName)
             os.remove(path)
             
             return True
