@@ -6,7 +6,7 @@ from typing import Generic, TypeVar
 from .BashColor import BashColor
 from .FileUtil import mkdir
 from .JsonUtil import fromJson, toDict
-from .PrintUtil import printS, printStack
+from .PrintUtil import printD, printStack
 
 T = TypeVar("T")
 
@@ -35,9 +35,9 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        entity = self.get(entity.id)
-        if(entity != None):
-            if(self.debug): printS("Error adding ", entity.id, ", ID already exists", color = BashColor.FAIL)
+        storedEntity = self.get(entity.id)
+        if(storedEntity != None):
+            printD("Error adding ", storedEntity.id, ", ID already exists", color = BashColor.FAIL, debug = self.debug)
             return False
 
         try:
@@ -134,9 +134,9 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        entity = self.get(entity.id)
-        if(entity == None):
-            printS("Error updating ", entity.id, ", entity does not exist", color = BashColor.FAIL)
+        storedEntity = self.get(entity.id)
+        if(storedEntity != None):
+            printD("Error updating ", storedEntity.id, ", entity does not exist.", color = BashColor.FAIL, debug = self.debug)
             return False
 
         try:
@@ -162,13 +162,13 @@ class LocalJsonRepository(Generic[T]):
             bool: Result.
         """
 
-        entity = self.get(id)
-        if(entity == None):
-            printS("Error removing ", id, ", entity does not exist", color = BashColor.FAIL)
+        storedEntity = self.get(id)
+        if(storedEntity != None):
+            printD("Error removing ", id, ", entity does not exist", color = BashColor.FAIL, debug = self.debug)
             return False
 
         try:
-            filename = entity.id + ".json"
+            filename = storedEntity.id + ".json"
             path = os.path.join(self.storagePath, filename)
             os.remove(path)
             
