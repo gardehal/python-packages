@@ -14,41 +14,41 @@ class FilePathObject():
         self.inputPath: str = fullPath
         self.inputPathClean: str = fullPath
 
-    def __init__(self, path: str, debug: bool = False):
-        if(path == None):
+    def __init__(self, filePath: str, debug: bool = False):
+        if(filePath == None):
             if(debug): print("FilePathObject: Argument path is None.")
             self.isFile = False
             return None
 
-        if(not os.path.isfile(path)):
+        if(not os.path.isfile(filePath)):
             if(debug): print("FilePathObject: Argument path is not a dir or file.")
             self.isFile = False
             return None
 
-        _path = path.replace(r"\\\\|\/\/|\/|\\", os.path.sep)
+        sanitizedFilePath = filePath.replace(r"\\\\|\/\/|\/|\\", os.path.sep)
 
-        _fullPath = None
-        _relativePath = None
-        if(os.path.isabs(_path)):
+        fullPath = None
+        relativePath = None
+        if(os.path.isabs(sanitizedFilePath)):
             if(debug): print("FilePathObject: Argument path is absolute.")
-            _fullPath = _path
-            _relativePath = os.path.realpath(_fullPath)
+            fullPath = sanitizedFilePath
+            relativePath = os.path.realpath(fullPath)
         else:
             if(debug): print("FilePathObject: Argument path is relative.")
-            _fullPath = os.path.abspath(_path)
-            _relativePath = _path
+            fullPath = os.path.abspath(sanitizedFilePath)
+            relativePath = sanitizedFilePath
         
         self.isFile: bool = True
-        self.fullPath: str = _fullPath
-        self.directory: str = os.path.split(_fullPath)[0]
-        self.relativePath: str = _relativePath
+        self.fullPath: str = fullPath
+        self.directory: str = os.path.split(fullPath)[0]
+        self.relativePath: str = relativePath
         self.fileLeaf: str = os.path.split(self.directory)[-1]
-        self.filename: str = os.path.basename(_fullPath)
+        self.filename: str = os.path.basename(fullPath)
         self.fileRoot: str = ".".join(self.filename.split(".")[:-1])
-        self.extension: str =  _fullPath.split(".")[-1] if ("." in _fullPath) else ""
+        self.extension: str =  fullPath.split(".")[-1] if ("." in fullPath) else ""
         self.extensionWithDot: str = f".{self.extension}"
-        self.inputPath: str = path
-        self.inputPathClean: str = _path
+        self.inputPath: str = sanitizedFilePath
+        self.inputPathClean: str = sanitizedFilePath
 
         if(debug): print("FilePathObject: No errors.")
 
@@ -68,7 +68,7 @@ class FilePathObject():
         - extension: str = ".src"\n
         - extensionWithDot: str = "src"\n
         - inputPath: str = input of "path" argument\n
-        - inputPathClean: str = input of "path" argument where separators like "/", "//", "\\\\" bas been replaces with system separator\n
+        - inputPathClean: str = input of "path" argument where separators like "/", "//", "\\\\" bas been replaces with system separator
         """
 
         return None
