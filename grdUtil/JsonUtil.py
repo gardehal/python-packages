@@ -7,16 +7,17 @@ T = TypeVar("T")
 def toDict(obj: object) -> dict:
     """
     Converts objects to dictionaries.
+    
     Source: https://www.codegrepper.com/code-examples/whatever/python+nested+object+to+dict
 
     Args:
-        obj (object): object to convert
+        obj (object): Object to convert.
 
     Returns:
-        dict: dictionary of input object
+        dict: Dictionary of input object.
     """
     
-    if not  hasattr(obj,"__dict__"):
+    if(obj == None or not hasattr(obj, "__dict__")):
         return obj
     
     result = {}
@@ -44,10 +45,10 @@ def toJson(obj: object) -> str:
     Converts objects to JSON though dictionaries.
 
     Args:
-        obj (object): object to convert
+        obj (object): Object to convert.
 
     Returns:
-        str: JSON string
+        str: JSON string.
     """
     
     dict = toDict(obj)
@@ -58,11 +59,11 @@ def writeToJsonFile(filepath: str, obj: object) -> bool:
     Writes object obj to a JSON format in file from filepath.
 
     Args:
-        filepath (str): path to file to store JSON in
-        obj (object): object to save
+        filepath (str): Path to file to store JSON in.
+        obj (object): Object to save.
 
     Returns:
-        bool: true = success
+        bool: Result.
     """
     
     asDict = toDict(obj)
@@ -76,11 +77,11 @@ def readJsonFile(filepath: str, typeT: T) -> T:
     Opens and reads a JSON formatted file, returning object of type T.
 
     Args:
-        filepath (str): path to file to read JSON from
-        typeT (T): object to convert to
+        filepath (str): Path to file to read JSON from.
+        typeT (T): Type to convert to.
 
     Returns:
-        T or None: object from JSON file, if file is empty: None
+        T: T of object if any, else None.
     """
     
     fileContent = open(filepath, "r").read()
@@ -90,29 +91,29 @@ def readJsonFile(filepath: str, typeT: T) -> T:
         return fromJson(fileContent, typeT)
 
 def fromJson(jsonStr: str, typeT: T) -> T:
-        """
-        Converts JSON to an object T.
+    """
+    Converts JSON to an object T.
 
-        Args:
-            str (str): string to convert
-            typeT (T): object to convert to
+    Args:
+        str (str): String to convert.
+        typeT (T): Type to convert to.
 
-        Returns:
-            T: object from JSON
-        """
-        
-        jsonDict = json.loads(jsonStr)
-        asObj = typeT(**jsonDict)
+    Returns:
+        T: T of object from JSON.
+    """
+    
+    jsonDict = json.loads(jsonStr)
+    asObj = typeT(**jsonDict)
 
-        for fieldName in dir(asObj):
-            # Skip default fields and functions
-            if(fieldName.startswith('__') or callable(getattr(asObj, fieldName))):
-                continue
+    for fieldName in dir(asObj):
+        # Skip default fields and functions
+        if(fieldName.startswith('__') or callable(getattr(asObj, fieldName))):
+            continue
 
-            field = getattr(asObj, fieldName)
-            fieldType = type(field)
+        field = getattr(asObj, fieldName)
+        fieldType = type(field)
 
-            if("uuid" in str(fieldType) or "datetime" in str(fieldType)):
-                continue
+        if("uuid" in str(fieldType) or "datetime" in str(fieldType)):
+            continue
 
-        return asObj
+    return asObj
