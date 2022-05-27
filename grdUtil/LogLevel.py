@@ -2,9 +2,11 @@ from enum import IntEnum
 
 
 class LogLevel(IntEnum):
-    NONE = 1
-    INFO = 2
-    VERBOSE = 3
-    WARNING = 4
-    ERROR = 5
-    DEBUG = 6
+    # Lower = log less
+    NONE = 0
+    CRITICAL = 100
+    ERROR = 200
+    WARNING = 300
+    INFO = 400
+    DEBUG = 500
+    VERBOSE = 600
