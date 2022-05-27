@@ -1,24 +1,30 @@
-from datetime import datetime
 import os
 import re
-from typing import List
+from datetime import datetime
 
 import validators
 
-from grdUtil.BashColor import BashColor
-from grdUtil.PrintUtil import printS
+from .BashColor import BashColor
+from .PrintUtil import printS
 
 
-def extractArgs(currentArgsIndex, args, numbersOnly = False, pathsOnly = False, urlsOnly = False, flagIndicator = "-"):
+def extractArgs(currentArgsIndex: int, args: list[str], numbersOnly: bool = False, pathsOnly: bool = False, urlsOnly: bool = False, flagIndicator: str = "-") -> list[str]:
     """
-    Extract non-flag arguments from array of args, options to only accept numbers, paths, urls.\n\n
-    int currentArgsIndex
-    array of strings args
-    bool numbersOnly
-    bool pathsOnly
-    bool urlsOnly
+    Extract non-flag arguments from array of args, options to only accept numbers, paths, urls.
+
+    Args:
+        currentArgsIndex (int): Index for argument args. Will only look in args after this index.
+        args (list[str]): Arguments to sift though.
+        numbersOnly (bool, optional): Only accept numbers? Defaults to False.
+        pathsOnly (bool, optional): Only accept (file) paths? Defaults to False.
+        urlsOnly (bool, optional): Only accept URLs? Defaults to False.
+        flagIndicator (str, optional): Indicator for new arguments, eg. new set of arguments unrelated to argument args. Defaults to "-".
+
+    Returns:
+        list[str]: Arguments extracted.
     """
-    _args = []
+    
+    result = []
     for arg in args[currentArgsIndex + 1:]:
         if(arg.startswith(flagIndicator)):
             break
@@ -32,76 +38,83 @@ def extractArgs(currentArgsIndex, args, numbersOnly = False, pathsOnly = False, 
             printS("Argument ", arg, " is not a url.")
             continue
 
-        _args.append(arg)
-    return _args
+        result.append(arg)
+    return result
 
-def getIdsFromInput(input: List[str], existingIds: List[str], indexList: List[any], limit: int = None, returnOnNonIds: bool = False, debug: bool = False) -> List[str]:
+def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any], limit: int = None, returnOnNonIds: bool = False, debug: bool = False) -> list[str]:
     """
     Get IDs from a list of inputs, whether they are raw IDs that must be checked via the database or indices (formatted "i[index]") of a list. This defaults to the first element in existingIds if input is empty.
 
     Args:
-        input (List[str]): input if IDs/indices
-        existingIds (List[str]): existing IDs to compare with
-        indexList (List[any]): List of object (must have field "id") to index from
-        limit (int): limit the numbers of arguments to parse
-        returnOnNonIds (bool): return valid input IDs if the current input is no an ID, to allow input from user to be something like \"id id id bool\" which allows unspecified IDs before other arguments
-        debug (bool): should debug-information be printed
+        args (List[str]): Args if IDs/indices.
+        existingIds (List[str]): Existing IDs to compare with.
+        indexList (List[any]): List of object (must have field "id") to index from.
+        limit (int): Limit the numbers of arguments to parse.
+        returnOnNonIds (bool): Return valid input IDs if the current input is no an ID, to allow input from user to be something like \"id id id bool\" which allows unspecified IDs before other arguments.
+        debug (bool): Should debug-information be printed.
 
     Returns:
-        List[str]: List of existing IDs for input which can be found
+        list[str]: List of existing IDs for input which can be found.
     """
     
     if(len(existingIds) == 0 or len(indexList) == 0):
         printS("DEBUG: getIdsFromInput - Length of input \"existingIds\" (", len(existingIds), ") or \"indexList\" (", len(indexList), ") was 0.", color = BashColor.WARNING, doPrint = debug)
         return []
 
-    _result = []
+    result = []
     
-    if(len(input) == 0):
-        _result.append(existingIds[0])
-        return _result
+    if(len(args) == 0):
+        result.append(existingIds[0])
+        return result
 
-    for i, _string in enumerate(input):
+    for i, arg in enumerate(args):
         if(limit != None and i >= limit):
-            printS("DEBUG: getIdsFromInput - Returning data before input ", _string, ", limit (", limit, ") reached.", color = BashColor.WARNING, doPrint = debug)
+            printS("DEBUG: getIdsFromInput - Returning data before input ", arg, ", limit (", limit, ") reached.", color = BashColor.WARNING, doPrint = debug)
             break
         
-        if(_string[0] == "i"):  # Starts with "i", like index of "i2" is 2, "i123" is 123 etc.
-            if(not isNumber(_string[1:])):
+        if(arg[0] == "i"):  # Starts with "i", like index of "i2" is 2, "i123" is 123 etc.
+            if(not isNumber(arg[1:])):
                 if(returnOnNonIds):
-                    return _result
+                    return result
                 
-                printS("Argument ", _string, " is not a valid index format, must be \"i\" followed by an integer, like \"i0\". Argument not processed.", color = BashColor.FAIL)
+                printS("Argument ", arg, " is not a valid index format, must be \"i\" followed by an integer, like \"i0\". Argument not processed.", color = BashColor.FAIL)
                 continue
 
-            _index = int(float(_string[1:]))
-            _indexedEntity = indexList[_index]
+            index = int(float(arg[1:]))
+            indexedEntity = indexList[index]
 
-            if(_indexedEntity != None):
-                _result.append(_indexedEntity.id)
+            if(indexedEntity != None):
+                result.append(indexedEntity.id)
             else:
                 if(returnOnNonIds):
-                    return _result
+                    return result
                 
-                printS("Failed to get data for index ", _index, ", it is out of bounds.", color = BashColor.FAIL)
-        else:  # Assume input is ID if it's not, users problem. Could also check if ID in getAllIds()
-            if(_string in existingIds):
-                _result.append(_string)
+                printS("Failed to get data for index ", index, ", it is out of bounds.", color = BashColor.FAIL)
+        else:  # Assume args is ID if it's not, users problem. Could also check if ID in getAllIds()
+            if(arg in existingIds):
+                result.append(arg)
             else:
                 if(returnOnNonIds):
-                    return _result
+                    return result
                 
-                printS("Failed to add playlist with ID \"", _string, "\", no such entity found in database.", color = BashColor.FAIL)
+                printS("Failed to add playlist with ID \"", arg, "\", no such entity found in database.", color = BashColor.FAIL)
                 continue
 
-    return _result
+    return result
 
 # https://note.nkmk.me/en/python-check-int-float/
-def isNumber(n, intOnly = False):
+def isNumber(n: any, intOnly: bool = False) -> bool:
     """
-    Try parse n as float or inter, return true/false.\n\n
-    any n
+    Try parse n as float or inter, return true/false.
+
+    Args:
+        n (any): Value to check.
+        intOnly (bool, optional): Should number be validated as an integer? Defaults to False.
+
+    Returns:
+        bool: Result.
     """
+    
     try:
         float(n)
     except ValueError:
@@ -112,17 +125,17 @@ def isNumber(n, intOnly = False):
         else:
             return True
 
-def getIfExists(array: List[any], index: int, default: any = None) -> any:
+def getIfExists(array: list[any], index: int, default: any = None) -> any:
     """
     Get the element at index from array, if the length of the array is greater or equal to the index + 1.
 
     Args:
-        array (List[any]): List to get from.
+        array (list[any]): List to get from.
         index (int): Index to get.
         default (any, optional): Default value if item does not exist. Defaults to None.
 
     Returns:
-        any: index of list if exists, else default
+        any: Index of list if exists, else default.
     """
     return array[index] if len(array) >= index + 1 else default
 
@@ -137,25 +150,25 @@ def sanitize(*args, mode: int = 1) -> str:
     TODO - replace only worst of escape charaters
 
     Args:
-        args (*args): any values to sanitize and return as string
-        mode (int, optional): Mode to use. Defaults to 0.
+        args (*args): Any values to sanitize and return as string.
+        mode (int, optional): Mode to use. Defaults to 1.
 
     Returns:
-        str: concatinated, sanitized result
+        str: Concatenated, sanitized result.
     """
     
-    _result = ""
+    result = ""
     for element in args:
         _element = str(element)
         
         if(mode == 0):
-            _result += re.sub("[^a-zA-Z0-9]", "", _element)
+            result += re.sub("[^a-zA-Z0-9]", "", _element)
         if(mode == 1):
-            _result += re.sub("[^a-zA-Z0-9\s]", "", _element)
+            result += re.sub("[^a-zA-Z0-9\s]", "", _element)
         if(mode == 2):
-            _result += re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", "", _element)
+            result += re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", "", _element)
             
-    return _result
+    return result
 
 def stringToDatetime(toConvert: str, format: str = "%Y-%m-%d %H:%M:%S.%f") -> datetime:
     """
@@ -166,7 +179,7 @@ def stringToDatetime(toConvert: str, format: str = "%Y-%m-%d %H:%M:%S.%f") -> da
         format (str, optional): DateTime format to use. Defaults to %Y-%m-%d %H:%M:%S.%f e.g. 2020-12-31 23:59:59.999999, same format as datetime.now().
 
     Returns:
-        datetime: datetime result
+        datetime: Datetime result.
     """
     
     return datetime.strptime(toConvert, format)
@@ -180,7 +193,7 @@ def datetimeToString(toConvert: datetime, format: str = "%Y-%m-%d %H:%M:%S.%f") 
         format (str, optional): DateTime format to use. Defaults to %Y-%m-%d %H:%M:%S.%f e.g. 2020-12-31 23:59:59.999999, same format as datetime.now().
 
     Returns:
-        datetime: datetime result
+        datetime: Datetime result.
     """
     
     return toConvert.strftime(format)
