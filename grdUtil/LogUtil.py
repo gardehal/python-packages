@@ -29,36 +29,6 @@ class LogUtil():
         
         mkdir(logDir)
         
-    def writeLog(self, text: str, fileExtension: str = ".md", logTitle: str = "LOGLEVEL\tDATETIME\tCALLING_FUNCTION\tMESSAGE") -> bool:
-        """
-        Write text to file in logDir.
-
-        Args:
-            text (str): Text to log.
-            fileExtension (str): Extension of file. Defaults to .md.
-            logTitle (str): Title that appears as the first line. Defaults to LOGLEVEL\tDATETIME\tCALLING_FUNCTION\tMESSAGE.
-
-        Returns:
-            bool: Result of write.
-        """
-        
-        dateNow = date.fromtimestamp(time.time()).isoformat()
-        logFileName = "".join([dateNow, fileExtension])
-        logPath = os.path.join(self.logDir, logFileName)
-        
-        if(not os.path.isfile(logPath)):
-            file = open(logPath, "a")
-            file.write(logTitle)
-            file.close()
-            
-        try:
-            file = open(logPath, "a")
-            file.write("".join(["\n", text]))
-            file.close()
-            return True
-        except:
-            return False
-        
     def shouldLog(self, logLevel: LogLevel) -> bool:
         """
         Should items be logged/printed based on log level.
@@ -85,12 +55,12 @@ class LogUtil():
         
         return logLevel if(logLevel != None) else self.logLevel
         
-    def logAsJson(self, entity: any, logLevel: LogLevel = None, doPrint: bool = False) -> str:
+    def logAsJson(self, object: any, logLevel: LogLevel = None, doPrint: bool = False) -> str:
         """
         Log argument object as JSON to file in path self.logDir.
 
         Args:
-            entity (any): Object to log. Suggested to wrap your actual object in LogObject.
+            object (any): Object to log. It is suggested to wrap your actual object in LogObject.
             logLevel (LogLevel, optional): LogLevel to log as. Defaults to None (will use self.logLevel).
             doPrint (bool, optional): Should log result be printed to print(). Defaults to False.
 
@@ -102,8 +72,11 @@ class LogUtil():
         if(not self.shouldLog(validLogLevel)):
             return None
         
-        log = toDict(entity)
-        logResult = self.writeLog(log)
+        # if(type(object) == LogLevel):
+            # set datetime and loglevel fields
+        
+        log = toDict(object)
+        logResult = self.writeJsonLog(log)
         if(not logResult):
             return None
         
@@ -130,15 +103,72 @@ class LogUtil():
         
         level = str(validLogLevel.name)
         now = datetime.utcnow().replace(tzinfo = timezone.utc).isoformat()
+        caller = inspect.getframeinfo(inspect.stack()[1][0])
         logMessage = "".join([str(_) for _ in args])
         
-        currentFrame = inspect.currentframe()
-        callerFrame = inspect.getouterframes(currentFrame, 2)
-        parentMethodName = callerFrame[1][3]
-        
-        log = "".join([level, "\t", now, "\t", parentMethodName, "\t", logMessage])
-        logResult = self.writeLog(log)
+        log = "".join([level, "\t", now, "\t", caller.filename, ":", caller.lineno, "\t", logMessage])
+        logResult = self.writeTextLog(log)
         if(not logResult):
             return None
         
         return log
+        
+    def writeJsonLog(self, object: any, fileExtension: str = ".md", logTitle: str = "LOGLEVEL\tDATETIME\tCALLER\tMESSAGE") -> bool:
+        """
+        Log arguments object as JSON to file in path self.logDir.
+
+        Args:
+            object (any): JSON object to log.
+            fileExtension (str): Extension of file. Defaults to .md.
+            logTitle (str): Title that appears as the first line. Defaults to LOGLEVEL\tDATETIME\tCALLER\tMESSAGE.
+
+        Returns:
+            bool: Result of write.
+        """
+        
+        dateNow = date.fromtimestamp(time.time()).isoformat()
+        logFileName = "".join([dateNow, fileExtension])
+        logPath = os.path.join(self.logDir, logFileName)
+        
+        if(not os.path.isfile(logPath)):
+            file = open(logPath, "a")
+            file.write(logTitle)
+            file.close()
+            
+        try:
+            file = open(logPath, "a")
+            # dump, append as JSON list
+            file.close()
+            return True
+        except:
+            return False
+        
+    def writeTextLog(self, text: str, fileExtension: str = ".md", logTitle: str = "LOGLEVEL\tDATETIME\tCALLER\tMESSAGE") -> bool:
+        """
+        Write text to file in logDir.
+
+        Args:
+            text (str): Text to log.
+            fileExtension (str): Extension of file. Defaults to .md.
+            logTitle (str): Title that appears as the first line. Defaults to LOGLEVEL\tDATETIME\tCALLER\tMESSAGE.
+
+        Returns:
+            bool: Result of write.
+        """
+        
+        dateNow = date.fromtimestamp(time.time()).isoformat()
+        logFileName = "".join([dateNow, fileExtension])
+        logPath = os.path.join(self.logDir, logFileName)
+        
+        if(not os.path.isfile(logPath)):
+            file = open(logPath, "a")
+            file.write(logTitle)
+            file.close()
+            
+        try:
+            file = open(logPath, "a")
+            file.write("".join(["\n", text]))
+            file.close()
+            return True
+        except:
+            return False
