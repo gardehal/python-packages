@@ -1,8 +1,10 @@
 import os
 import re
 from datetime import datetime
+from enum import Enum
 
 import validators
+from grdException.ArgumentException import ArgumentException
 
 from .BashColor import BashColor
 from .PrintUtil import printS
@@ -81,7 +83,7 @@ def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any
                 continue
 
             index = int(float(arg[1:]))
-            indexedEntity = indexList[index]
+            indexedEntity = getIfExists(indexList, index)
 
             if(indexedEntity != None):
                 result.append(indexedEntity.id)
@@ -197,3 +199,27 @@ def datetimeToString(toConvert: datetime, format: str = "%Y-%m-%d %H:%M:%S.%f") 
     """
     
     return toConvert.strftime(format)
+
+def getEnumFromValueName(enumType: Enum, valueName: str) -> Enum:
+    """
+    Convert the value name as string to a corresponding Enum for argument enumType.
+    Not ideal to use generic Enum instead of something like a generic type T, but it works.
+    
+    Inspired by: https://stackoverflow.com/a/56567247
+
+    Args:
+        enumType (Enum): Enum to convert to.
+        valueName (str): String of value name to get from argument enumType. Case sensitive.
+
+    Raises:
+        ArgumentException: valueName not found in enumType.
+
+    Returns:
+        Enum: The entry of enumType with the value valueName.
+    """
+    
+    for k, v in enumType.__members__.items():
+        if(k == valueName):
+            return v
+    else:
+        raise ArgumentException(f"{valueName} is not a valid {enumType.__name__} option.")
