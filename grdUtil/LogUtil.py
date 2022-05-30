@@ -4,7 +4,10 @@ import os
 import time
 from datetime import date, datetime, timezone
 
+from grdException.ArgumentException import ArgumentException
+
 from .FileUtil import mkdir
+from .InputUtil import getEnumFromValueName
 from .JsonUtil import toDict
 from .LogLevel import LogLevel
 
@@ -14,18 +17,30 @@ class LogUtil():
     debug: bool
     logLevel: LogLevel
     
-    def __init__(self, logDir: str, debug: bool = True, logLevel: LogLevel = LogLevel.ERROR) -> None:
+    def __init__(self, logDir: str, debug: bool = True, logLevel: LogLevel = LogLevel.ERROR, logLevelString: str = None) -> None:
         """
         Initiate class for logging data to files named after date logged.
 
         Args:
             logDir (str): Path to directory for logs.
             debug (bool, optional): Should debug values be logged and printed? Defaults to True.
-            logLevel (LogLevel, optional): Current LogLevel (e.g. level set by user). Defaults to LogLevel.ERROR.
+            logLevel (LogLevel, optional): Current LogLevel (e.g. setting set by user). Defaults to LogLevel.ERROR.
+            logLevelString (str, optional): Current LogLevel as string (e.g. setting set by user). Defaults to ERROR.
         """
+        
+        if(logLevel == None and logLevelFromString == None):
+            raise ArgumentException(f"__init__ - Arguments logLevel OR logLevelString must be set.")
+        
         self.logDir = logDir
         self.debug = debug
         self.logLevel = logLevel
+        
+        if(logLevelString != None):
+            logLevelFromString = getEnumFromValueName(LogLevel, logLevelString.upper())
+            if(logLevelFromString != None):
+                self.logLevel = logLevelFromString
+            else:
+                raise ArgumentException(f"__init__ - Argument logLevelString {logLevelString} was not a valid LogLevel value. Must be the name of any enum in LogLevel.")
         
         mkdir(logDir)
         
@@ -106,7 +121,7 @@ class LogUtil():
         caller = inspect.getframeinfo(inspect.stack()[1][0])
         logMessage = "".join([str(_) for _ in args])
         
-        log = "".join([level, "\t", now, "\t", caller.filename, ":", caller.lineno, "\t", logMessage])
+        log = "".join([level, "\t", now, "\t", caller.filename, ":", str(caller.lineno), "\t", logMessage])
         logResult = self.writeTextLog(log)
         if(not logResult):
             return None
