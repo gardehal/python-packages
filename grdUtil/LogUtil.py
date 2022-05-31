@@ -5,11 +5,13 @@ import time
 from datetime import date, datetime, timezone
 
 from grdException.ArgumentException import ArgumentException
+from grdException.WriteFileException import WriteFileException
 
 from .FileUtil import mkdir
 from .InputUtil import getEnumFromValueName
 from .JsonUtil import toDict
 from .LogLevel import LogLevel
+from .PrintUtil import printS, printStack
 
 
 class LogUtil():
@@ -95,6 +97,9 @@ class LogUtil():
         if(not logResult):
             return None
         
+        if(doPrint):
+            printS(log)
+            
         return log
 
     def logAsText(self, *args: any, logLevel: LogLevel = None, doPrint: bool = False) -> str:
@@ -124,7 +129,11 @@ class LogUtil():
         log = "".join([level, "\t", now, "\t", caller.filename, ":", str(caller.lineno), "\t", logMessage])
         logResult = self.writeTextLog(log)
         if(not logResult):
+            # self.logAsText(args, logLevel = logLevel, doPrint = doPrint)
             return None
+        
+        if(doPrint):
+            printS(log)
         
         return log
         
@@ -156,7 +165,10 @@ class LogUtil():
             file.close()
             return True
         except:
-            return False
+            printStack(doPrint = self.debug)
+            raise WriteFileException(f"Failed to write to file {logPath}.")
+        
+        return False
         
     def writeTextLog(self, text: str, fileExtension: str = ".md", logTitle: str = "LOGLEVEL\tDATETIME\tCALLER\tMESSAGE") -> bool:
         """
@@ -186,4 +198,7 @@ class LogUtil():
             file.close()
             return True
         except:
-            return False
+            printStack(doPrint = self.debug)
+            raise WriteFileException(f"Failed to write to file {logPath}.")
+        
+        return False
