@@ -16,6 +16,7 @@
 
 ## TODO
 
+- update shouldn't update soft deleted unless option to include is true
 - logutil, with log level and option to also print
 - asTable by column
 - asTable left-adjust text (default), center text, right-adjust text in cells
