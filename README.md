@@ -16,15 +16,9 @@
 
 ## TODO
 
-- update shouldn't update soft deleted unless option to include is true
-- logutil, with log level and option to also print
-- asTable by column
-- asTable left-adjust text (default), center text, right-adjust text in cells
-- update old methods with proper docstrings
+- logutil, missing JSON logging
 - import more common functions/exceptions
-- grdException vs grdExceptions - with S is wrong but not mentioned anywhere? chahce issue, attempted to delete all packages but still there?
-- debug print, if it can automatically get the name of calling function, use printS default warning, debug arg, format: "DEBUG: func - message"
-- update debugs in try/catch with printStack (e.g. jsonRepo)
 - do something so colors show in MS cmd, powershell, etc.
-- import still weird, should be .PrintUtil, not grdUtil.PrintUtil but doesn't always work..
+- import, cannot use relative path like "..grdUtil.x" in grdService, or "..grdException.x" anywhere. Options? Always have to use self package?
+- BaseService.baseRepository should be generic repo type, not locked to LocalJson, and be injectable
 - delete WebUtil?
