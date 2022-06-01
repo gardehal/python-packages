@@ -25,7 +25,7 @@ class BaseService(Generic[T]):
         BaseService.add(self, ...)
 
     Args:
-        Generic (TypeT): Entity object to store
+        Generic (TypeT): Entity object to store.
     """
     
     storagePath: str = None
@@ -79,13 +79,27 @@ class BaseService(Generic[T]):
         Check if entity exists by ID.
 
         Args:
-            id (str): id of entity to get
+            id (str): ID of entity to get,
 
         Returns:
-            bool: exists
+            bool: Exists,
         """
 
         return self.entityRepository.exists(id)
+        
+    def isDeleted(self, id: str) -> bool:
+        """
+        Check if entity T given by ID exists and if it is (soft) deleted.
+
+        Args:
+            id (str): ID of entity to check.
+
+        Returns:
+            bool: Entity exists and is (soft) deleted.
+        """
+
+        entity = self.get(id, includeSoftDeleted = True)
+        return (entity != None and hasattr(entity, "deleted") and entity.deleted != None)
         
     def get(self, id: str, includeSoftDeleted: bool = False) -> T:
         """
@@ -134,7 +148,7 @@ class BaseService(Generic[T]):
         Get all IDs of entities.
 
         Args:
-            includeSoftDeleted (bool): should include soft-deleted entities.
+            includeSoftDeleted (bool): Should include soft-deleted entities?
 
         Returns:
             list[str]: IDs as list[str] from storage.
@@ -143,17 +157,21 @@ class BaseService(Generic[T]):
         all = self.getAll(includeSoftDeleted)
         return [entity.id for entity in all]
 
-    def update(self, entity: T) -> T:
+    def update(self, entity: T, includeSoftDeleted: bool = False) -> T:
         """
         Update given entity T.
 
         Args:
             entity (T): Entity to update.
+            includeSoftDeleted (bool): should include soft-deleted entities.
 
         Returns:
             T | None: T if success, else None.
         """
 
+        if(not includeSoftDeleted and self.isDeleted(entity.id)):
+            return None
+        
         if(hasattr(entity, "updated")):
             entity.updated = datetime.now()
         
@@ -187,10 +205,10 @@ class BaseService(Generic[T]):
         
     def restore(self, id: str) -> T:
         """
-        Restore a (soft) deleted Entity.
+        Restore a (soft) deleted entity.
 
         Args:
-            id (str): ID of Entity to restore.
+            id (str): ID of entity to restore.
 
         Returns:
             T | None: T if success, else None.
@@ -203,7 +221,7 @@ class BaseService(Generic[T]):
         if(hasattr(entity, "deleted")):
             entity.deleted = None
         
-        if(self.update(entity)):
+        if(self.update(entity, includeSoftDeleted = True)):
             return entity
         else:
             return None
@@ -240,8 +258,8 @@ class BaseService(Generic[T]):
             T | None: T if success, else None.
         """
 
-        if(self.get(entity.id) == None):
+        if(not self.exists(entity.id)):
             return self.add(entity)
 
-        return self.update(entity)
+        return self.update(entity, includeSoftDeleted = True)
     
