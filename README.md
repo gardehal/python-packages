@@ -1,5 +1,6 @@
 # python-packages
- Collection of general Python functions.
+
+Collection of general Python functions.
 
 ## Install locally
 
@@ -17,8 +18,8 @@
 ## TODO
 
 - logutil, missing JSON logging
-- import more common functions/exceptions
 - do something so colors show in MS cmd, powershell, etc.
 - import, cannot use relative path like "..grdUtil.x" in grdService, or "..grdException.x" anywhere. Options? Always have to use self package?
 - BaseService.baseRepository should be generic repo type, not locked to LocalJson, and be injectable
 - delete WebUtil?
+- convert DatetimeObject, FilePathObject to util functions 
