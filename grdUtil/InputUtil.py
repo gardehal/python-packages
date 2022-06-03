@@ -172,34 +172,6 @@ def sanitize(*args, mode: int = 1) -> str:
             
     return result
 
-def stringToDatetime(toConvert: str, format: str = "%Y-%m-%d %H:%M:%S.%f") -> datetime:
-    """
-    Parses string to datetime.
-
-    Args:
-        toConvert (str): String of date or time or datetime to convert.
-        format (str, optional): DateTime format to use. Defaults to %Y-%m-%d %H:%M:%S.%f e.g. 2020-12-31 23:59:59.999999, same format as datetime.now().
-
-    Returns:
-        datetime: Datetime result.
-    """
-    
-    return datetime.strptime(toConvert, format)
-
-def datetimeToString(toConvert: datetime, format: str = "%Y-%m-%d %H:%M:%S.%f") -> str:
-    """
-    Parses datetime to string.
-
-    Args:
-        toConvert (datetime): String of date or time or datetime to convert.
-        format (str, optional): DateTime format to use. Defaults to %Y-%m-%d %H:%M:%S.%f e.g. 2020-12-31 23:59:59.999999, same format as datetime.now().
-
-    Returns:
-        datetime: Datetime result.
-    """
-    
-    return toConvert.strftime(format)
-
 def getEnumFromValueName(enumType: Enum, valueName: str) -> Enum:
     """
     Convert the value name as string to a corresponding Enum for argument enumType.
