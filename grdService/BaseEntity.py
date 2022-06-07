@@ -1,11 +1,13 @@
 import uuid
 from datetime import datetime
 
+from grdUtil.DateTimeUtil import getDateTime
+
 
 class BaseEntity():
     def __init__(self,
-                 created: datetime = datetime.now(),
-                 updated: datetime = datetime.now(),
+                 created: datetime = getDateTime(),
+                 updated: datetime = getDateTime(),
                  deleted: datetime = None,
                  id: str = str(uuid.uuid4())):
         self.created: datetime = created
