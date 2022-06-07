@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime
 from typing import Generic, TypeVar
 
+from grdUtil.DateTimeUtil import getDateTime
 from grdUtil.BashColor import BashColor
 from grdUtil.LocalJsonRepository import LocalJsonRepository
 from grdUtil.PrintUtil import printS
@@ -63,11 +63,11 @@ class BaseService(Generic[T]):
         if(hasattr(entity, "id") and entity.id == None):
             entity.id = str(uuid.uuid4())
         if(hasattr(entity, "added") and entity.added == None):
-            entity.added = datetime.now()
+            entity.added = getDateTime()
         if(hasattr(entity, "created") and entity.created == None):
-            entity.created = datetime.now()
+            entity.created = getDateTime()
         if(hasattr(entity, "updated") and entity.updated == None):
-            entity.updated = datetime.now()
+            entity.updated = getDateTime()
         
         if(self.entityRepository.add(entity)):
             return entity
@@ -173,7 +173,7 @@ class BaseService(Generic[T]):
             return None
         
         if(hasattr(entity, "updated")):
-            entity.updated = datetime.now()
+            entity.updated = getDateTime()
         
         if(self.entityRepository.update(entity)):
             return entity
@@ -196,7 +196,7 @@ class BaseService(Generic[T]):
             return None
 
         if(hasattr(entity, "deleted")):
-            entity.deleted = datetime.now()
+            entity.deleted = getDateTime()
             
         if(self.update(entity)):
             return entity
