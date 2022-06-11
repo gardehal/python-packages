@@ -23,3 +23,4 @@ Collection of general Python functions.
 - BaseService.baseRepository should be generic repo type, not locked to LocalJson, and be injectable
 - delete WebUtil?
 - convert DatetimeObject, FilePathObject to util functions 
+- json datetimes defaults to string, could be fixed?
