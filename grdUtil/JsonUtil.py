@@ -52,7 +52,7 @@ def toJson(obj: object) -> str:
     """
     
     dict = toDict(obj)
-    return json.dumps(dict, default=str)
+    return json.dumps(dict, default = str)
 
 def writeToJsonFile(filepath: str, obj: object) -> bool:
     """
@@ -68,7 +68,7 @@ def writeToJsonFile(filepath: str, obj: object) -> bool:
     
     asDict = toDict(obj)
     with open(filepath, "w") as file:
-        json.dump(asDict, file, indent=4, default=str)
+        json.dump(asDict, file, indent = 4, default = str)
         
     return True
 
@@ -101,6 +101,7 @@ def fromJson(jsonStr: str, typeT: T) -> T:
     Returns:
         T: T of object from JSON.
     """
+    # https://pynative.com/python-serialize-datetime-into-json/ ?
     
     jsonDict = json.loads(jsonStr)
     asObj = typeT(**jsonDict)
