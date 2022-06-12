@@ -3,7 +3,7 @@ import re
     
 def getDateTime(asUtc: bool = True) -> datetime:
     """
-    Get datetime as ISO format, with option to get as UTC.
+    Get datetime.now, with option to get as UTC.
 
     Args:
         asUtc (bool, optional): Get as UTC? Defaults to True.
@@ -13,9 +13,22 @@ def getDateTime(asUtc: bool = True) -> datetime:
     """
     
     if(asUtc):
-        return datetime.utcnow().replace(tzinfo = timezone.utc).isoformat()
+        return datetime.utcnow().replace(tzinfo = timezone.utc)
     
-    return datetime.now().isoformat()
+    return datetime.now()
+    
+def getDateTimeString(asUtc: bool = True) -> str:
+    """
+    Get datetime as ISO format, with option to get as UTC.
+
+    Args:
+        asUtc (bool, optional): Get as UTC? Defaults to True.
+
+    Returns:
+        str: Result.
+    """
+    
+    return getDateTime(asUtc).isoformat()
 
 def getDateTimeAsNumber(asUtc: bool = True) -> int:
     """
