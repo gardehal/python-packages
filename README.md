@@ -23,4 +23,4 @@ Collection of general Python functions.
 - BaseService.baseRepository should be generic repo type, not locked to LocalJson, and be injectable
 - delete WebUtil?
 - convert DatetimeObject, FilePathObject to util functions 
-- json datetimes defaults to string, could be fixed?
+- json datetimes defaults to string, could be fixed? - seems not, despite hinting like "created: datetime", if the data is null, the type() is always NoneType. Alterative1: Can hack with using a default method on every model, but its slow and unreliable. Alternative2: wrap all datetimes and default-to-string values in object like { pythonType: "datetime", value: "2022-..." }. Requires a lot of refactoring from current...
