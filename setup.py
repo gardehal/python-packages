@@ -4,7 +4,7 @@ import setuptools
 REQUIREMENTS = [i.strip() for i in open("requirements.txt").readlines()]
 
 setuptools.setup(name="grdUtil",
-version="1.4.3",
+version="1.5.0",
 description="Various Python utility methods, printing, input handling, colouring text in Bash, and more.",
 url="https://github.com/grdall/python-packages",
 author="grdAll",
