@@ -43,9 +43,10 @@ def extractArgs(currentArgsIndex: int, args: list[str], numbersOnly: bool = Fals
         result.append(arg)
     return result
 
-def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any], limit: int = None, returnOnNonIds: bool = False, debug: bool = False) -> list[str]:
+def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = true, debug: bool = False) -> list[str]:
     """
-    Get IDs from a list of inputs, whether they are raw IDs that must be checked via the database or indices (formatted "i[index]") of a list. This defaults to the first element in existingIds if input is empty.
+    Get IDs from a list of inputs, whether they are raw IDs that must be checked via the database or indices (formatted "i[index]") of a list. 
+    This defaults to the first element in existingIds if input is empty if setDefaultId is True.
 
     Args:
         args (List[str]): Args if IDs/indices.
@@ -53,7 +54,8 @@ def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any
         indexList (List[any]): List of object (must have field "id") to index from.
         limit (int): Limit the numbers of arguments to parse.
         returnOnNonIds (bool): Return valid input IDs if the current input is no an ID, to allow input from user to be something like \"id id id bool\" which allows unspecified IDs before other arguments.
-        debug (bool): Should debug-information be printed.
+        setDefaultId (bool): Should a default ID be picked (first)?
+        debug (bool): Should debug-information be printed?
 
     Returns:
         list[str]: List of existing IDs for input which can be found.
@@ -65,7 +67,7 @@ def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any
 
     result = []
     
-    if(len(args) == 0):
+    if(setDefaultId and len(args) == 0):
         result.append(existingIds[0])
         return result
 
