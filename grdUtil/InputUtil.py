@@ -1,6 +1,5 @@
 import os
 import re
-from datetime import datetime
 from enum import Enum
 
 import validators
@@ -43,7 +42,7 @@ def extractArgs(currentArgsIndex: int, args: list[str], numbersOnly: bool = Fals
         result.append(arg)
     return result
 
-def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = true, debug: bool = False) -> list[str]:
+def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = True, debug: bool = False) -> list[str]:
     """
     Get IDs from a list of inputs, whether they are raw IDs that must be checked via the database or indices (formatted "i[index]") of a list. 
     This defaults to the first element in existingIds if input is empty if setDefaultId is True.
