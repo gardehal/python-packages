@@ -196,3 +196,16 @@ def getEnumFromValueName(enumType: Enum, valueName: str) -> Enum:
             return v
     else:
         raise ArgumentException(f"{valueName} is not a valid {enumType.__name__} option.")
+
+def joinAsString(*args) -> str:
+    """
+    Join all args as string and return the resulting single string.
+    
+    Args:
+        args (*args): Any values to stringify.
+
+    Returns:
+        str: Joined string of all args.
+    """
+
+    return "".join([str(a) for a in args])
