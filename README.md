@@ -17,6 +17,7 @@ Collection of general Python functions.
 
 ## TODO
 
+- asTable should have an option to not use labels, data as columns, not rows - use lists issue?
 - logutil, missing JSON logging
 - do something so colors show in MS cmd, powershell, etc.
 - import, cannot use relative path like "..grdUtil.x" in grdService, or "..grdException.x" anywhere. Options? Always have to use self package?
