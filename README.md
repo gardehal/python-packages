@@ -17,6 +17,7 @@ Collection of general Python functions.
 
 ## TODO
 
+- string function returning a list for some reason
 - asTable should have an option to not use labels, data as columns, not rows - use lists issue?
 - logutil, missing JSON logging
 - do something so colors show in MS cmd, powershell, etc.
