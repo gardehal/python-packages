@@ -150,7 +150,7 @@ def sanitize(*args, mode: int = 1) -> str:
     1 - replace everything except latin alphanumerical symbols, whitespace (\\s) 
     2 - replace everything except latin alphanumerical symbols, whitespace (\\s), and common symbols like < > , . _ - : ; * ^ ! " ' # % & /   (  ) [ ] = + ?
     TODO - replace commonly known escape characters
-    TODO - replace only worst of escape charaters
+    TODO - replace only worst of escape characters
 
     Args:
         args (*args): Any values to sanitize and return as string.
@@ -160,18 +160,15 @@ def sanitize(*args, mode: int = 1) -> str:
         str: Concatenated, sanitized result.
     """
     
-    result = ""
-    for element in args:
-        _element = str(element)
-        
-        if(mode == 0):
-            result += re.sub("[^a-zA-Z0-9]", "", _element)
-        if(mode == 1):
-            result += re.sub("[^a-zA-Z0-9\s]", "", _element)
-        if(mode == 2):
-            result += re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", "", _element)
+    string = joinAsString(*args)
+    if(mode == 0):
+        return re.sub("[^a-zA-Z0-9]", "", string)
+    if(mode == 1):
+        return re.sub("[^a-zA-Z0-9\s]", "", string)
+    if(mode == 2):
+        return re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", "", string)
             
-    return result
+    return string
 
 def getEnumFromValueName(enumType: Enum, valueName: str) -> Enum:
     """
@@ -208,4 +205,13 @@ def joinAsString(*args) -> str:
         str: Joined string of all args.
     """
 
-    return "".join([str(a) for a in args])
+    result = ""
+    for a in args:
+        print(a)
+        if(isinstance(a, list)):
+            a = joinAsString(*a)
+        
+        print(a)
+        result += str(a)
+    
+    return result
