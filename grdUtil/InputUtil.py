@@ -160,7 +160,15 @@ def sanitize(*args, mode: int = 1) -> str:
         str: Concatenated, sanitized result.
     """
     
-    string = joinAsString(*args)
+    okArgs = []
+    try:
+        for arg in args:
+            joinAsString(arg) # TODO need a better check if arg is OK
+            okArgs.append(arg)
+    except Exception as e:
+        printS(f"There was a character in this argument that could not be decoded: {e}", BashColor.ERROR)
+    
+    string = joinAsString(okArgs)
     if(mode == 0):
         return re.sub("[^a-zA-Z0-9]", "", string)
     if(mode == 1):
