@@ -1,7 +1,7 @@
 import glob
 import json
 import os
-from typing import Generic, TypeVar
+from typing import Generic, List, TypeVar
 
 from .FileUtil import mkdir
 from .JsonUtil import fromJson, toDict
@@ -98,12 +98,12 @@ class LocalJsonRepository(Generic[T]):
             printStack(doPrint = self.debug)
             return None
 
-    def getAll(self) -> list[T]:
+    def getAll(self) -> List[T]:
         """
         Get all entities using local JSON files for storage.
 
         Returns:
-            list[T]: Entities if any, else empty list.
+            List[T]: Entities if any, else empty List.
         """
 
         try:
@@ -120,7 +120,7 @@ class LocalJsonRepository(Generic[T]):
             return all
         except Exception:
             printStack(doPrint = self.debug)
-            return list[T]
+            return List[T]
 
     def update(self, entity: T) -> bool:
         """

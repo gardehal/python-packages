@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 class DocUtil:
     def generateDetailsString(filePath: str, indent: str = "    ", methodName: str = "detailsString", writeToFile: bool = True, printMethod: bool = False) -> str:
@@ -50,7 +51,7 @@ class DocUtil:
         
         # Issues with taking ALL self.x? self.complexObject problems, self.class etc.?
         keys = re.findall("\sself\.(\w*)", fileContent)
-        keys = list(dict.fromkeys(keys))
+        keys = List(dict.fromkeys(keys))
         conditionalVars = []
         joinLines = []
         for key in keys:
