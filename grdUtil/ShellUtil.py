@@ -1,6 +1,4 @@
-import os
-
-import psutil
+from os import environ
 
 from .ShellType import ShellType
 
@@ -13,13 +11,11 @@ def getCurrentShellType() -> ShellType:
         ShellType: type of shell else None.
     """
     
-    _cliName = psutil.Process(os.getppid()).name().lower()
-    
-    if("cmd" in _cliName):
-        return ShellType.CMD
-    elif("powershell" in _cliName):
-        return ShellType.POWERSHELL
-    elif("bash" in _cliName):
+    if("shell" in environ and "bash" in environ["shell"]):
         return ShellType.BASH
+    elif("pathext" in environ and ".cpl" in environ["pathext"]):
+        return ShellType.POWERSHELL
+    elif("pathext" in environ):
+        return ShellType.CMD
     
     return None
