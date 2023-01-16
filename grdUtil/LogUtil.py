@@ -161,7 +161,7 @@ class LogUtil():
             
         try:
             file = open(logPath, "a")
-            # dump, append as JSON list
+            # dump, append as JSON List
             file.close()
             return True
         except:

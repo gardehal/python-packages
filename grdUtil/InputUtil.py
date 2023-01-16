@@ -1,6 +1,7 @@
 import os
 import re
 from enum import Enum
+from typing import List
 
 import validators
 from grdException.ArgumentException import ArgumentException
@@ -9,20 +10,20 @@ from .BashColor import BashColor
 from .PrintUtil import printS
 
 
-def extractArgs(currentArgsIndex: int, args: list[str], numbersOnly: bool = False, pathsOnly: bool = False, urlsOnly: bool = False, flagIndicator: str = "-") -> list[str]:
+def extractArgs(currentArgsIndex: int, args: List[str], numbersOnly: bool = False, pathsOnly: bool = False, urlsOnly: bool = False, flagIndicator: str = "-") -> List[str]:
     """
     Extract non-flag arguments from array of args, options to only accept numbers, paths, urls.
 
     Args:
         currentArgsIndex (int): Index for argument args. Will only look in args after this index.
-        args (list[str]): Arguments to sift though.
+        args (List[str]): Arguments to sift though.
         numbersOnly (bool, optional): Only accept numbers? Defaults to False.
         pathsOnly (bool, optional): Only accept (file) paths? Defaults to False.
         urlsOnly (bool, optional): Only accept URLs? Defaults to False.
         flagIndicator (str, optional): Indicator for new arguments, eg. new set of arguments unrelated to argument args. Defaults to "-".
 
     Returns:
-        list[str]: Arguments extracted.
+        List[str]: Arguments extracted.
     """
     
     result = []
@@ -42,9 +43,9 @@ def extractArgs(currentArgsIndex: int, args: list[str], numbersOnly: bool = Fals
         result.append(arg)
     return result
 
-def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = True, debug: bool = False) -> list[str]:
+def getIdsFromInput(args: List[str], existingIds: List[str], indexList: List[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = True, debug: bool = False) -> List[str]:
     """
-    Get IDs from a list of inputs, whether they are raw IDs that must be checked via the database or indices (formatted "i[index]") of a list. 
+    Get IDs from a List of inputs, whether they are raw IDs that must be checked via the database or indices (formatted "i[index]") of a List. 
     This defaults to the first element in existingIds if input is empty if setDefaultId is True.
 
     Args:
@@ -57,7 +58,7 @@ def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any
         debug (bool): Should debug-information be printed?
 
     Returns:
-        list[str]: List of existing IDs for input which can be found.
+        List[str]: List of existing IDs for input which can be found.
     """
     
     if(len(existingIds) == 0 or len(indexList) == 0):
@@ -100,7 +101,7 @@ def getIdsFromInput(args: list[str], existingIds: list[str], indexList: list[any
                 if(returnOnNonIds):
                     return result
                 
-                printS("Failed to add playlist with ID \"", arg, "\", no such entity found in database.", color = BashColor.FAIL)
+                printS("Failed to add playList with ID \"", arg, "\", no such entity found in database.", color = BashColor.FAIL)
                 continue
 
     return result
@@ -128,17 +129,17 @@ def isNumber(n: any, intOnly: bool = False) -> bool:
         else:
             return True
 
-def getIfExists(array: list[any], index: int, default: any = None) -> any:
+def getIfExists(array: List[any], index: int, default: any = None) -> any:
     """
     Get the element at index from array, if the length of the array is greater or equal to the index + 1.
 
     Args:
-        array (list[any]): List to get from.
+        array (List[any]): List to get from.
         index (int): Index to get.
         default (any, optional): Default value if item does not exist. Defaults to None.
 
     Returns:
-        any: Index of list if exists, else default.
+        any: Index of List if exists, else default.
     """
     return array[index] if len(array) >= index + 1 else default
 
@@ -216,7 +217,7 @@ def joinAsString(*args) -> str:
     result = ""
     for a in args:
         print(a)
-        if(isinstance(a, list)):
+        if(isinstance(a, List)):
             a = joinAsString(*a)
         
         print(a)

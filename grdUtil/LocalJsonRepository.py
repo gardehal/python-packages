@@ -1,7 +1,7 @@
 import glob
 import json
 import os
-from typing import List, Generic, TypeVar
+from typing import Generic, List, TypeVar
 
 from .FileUtil import mkdir
 from .JsonUtil import fromJson, toDict
@@ -103,7 +103,7 @@ class LocalJsonRepository(Generic[T]):
         Get all entities using local JSON files for storage.
 
         Returns:
-            List[T]: Entities if any, else empty list.
+            List[T]: Entities if any, else empty List.
         """
 
         try:

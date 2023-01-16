@@ -1,6 +1,6 @@
 import enum
 import json
-from typing import TypeVar, _GenericAlias
+from typing import List, TypeVar, _GenericAlias
 
 T = TypeVar("T")
 
@@ -28,7 +28,7 @@ def toDict(obj: object) -> dict:
         element = []
         if(isinstance(val, _GenericAlias)): # E.g. List[str]
             element = []
-        elif(isinstance(val, list)):
+        elif(isinstance(val, List)):
             for item in val:
                 element.append(toDict(item))
         elif(isinstance(val, enum.Enum)):

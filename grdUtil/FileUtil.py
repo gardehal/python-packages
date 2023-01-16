@@ -16,10 +16,10 @@ def mkdir(dirPath) -> None:
 
 def makeFiles(*args) -> bool:
     """
-    Create local files given by list of args.
+    Create local files given by List of args.
 
     Args:
-        args (list): paths+filenames to create
+        args (List): paths+filenames to create
 
     Returns:
         bool: success = true

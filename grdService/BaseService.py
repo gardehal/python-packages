@@ -1,8 +1,8 @@
 import uuid
-from typing import List, Generic, TypeVar
+from typing import Generic, List, TypeVar
 
-from grdUtil.DateTimeUtil import getDateTime
 from grdUtil.BashColor import BashColor
+from grdUtil.DateTimeUtil import getDateTime
 from grdUtil.LocalJsonRepository import LocalJsonRepository
 from grdUtil.PrintUtil import printS
 

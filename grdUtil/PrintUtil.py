@@ -4,8 +4,10 @@ import sys
 import threading
 import time
 import traceback
+from typing import List
 
 from grdException.ArgumentException import ArgumentException
+
 from .BashColor import BashColor
 from .ShellType import ShellType
 from .ShellUtil import getCurrentShellType
@@ -84,23 +86,23 @@ def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
 
     return color + str(text) + BashColor.ENDC.value
 
-def getMaxColumWidth(dataArray: list[list[str]], labels: list[str], paddingSpace: int = 2) -> list[int]:
+def getMaxColumWidth(dataArray: List[List[str]], labels: List[str], paddingSpace: int = 2) -> List[int]:
     """
     Get maximum width of a colum given a 2D array.
 
     Args:
-        dataArray (list[list[str]]): 2D list of lists of data to put in table.
-        labels (list[str]): 1D list of labels.
+        dataArray (List[List[str]]): 2D List of Lists of data to put in table.
+        labels (List[str]): 1D List of labels.
         paddingSpace (int): Length of padding space to take into account, eg. "foo" = 0, " bar " = 2.
 
     Returns:
-        list[int]: Widths of the widest strings per column.
+        List[int]: Widths of the widest strings per column.
     """
     
-    if(not isinstance(dataArray, list) or not isinstance(dataArray[0], list)):
-        raise ArgumentException("getMaxColumWidth - argument templateRow was not a valid list of strings.")
-    if(not isinstance(labels, list)):
-        raise ArgumentException("getMaxColumWidth - argument labels was not a valid list of strings.")
+    if(not isinstance(dataArray, List) or not isinstance(dataArray[0], List)):
+        raise ArgumentException("getMaxColumWidth - argument templateRow was not a valid List of strings.")
+    if(not isinstance(labels, List)):
+        raise ArgumentException("getMaxColumWidth - argument labels was not a valid List of strings.")
     if(len(labels) != len(dataArray[0])):
         raise ArgumentException("getMaxColumWidth - argument labels and dataArray[0] (and other instances in dataArray?) does not match in length.")
     
@@ -116,12 +118,12 @@ def getMaxColumWidth(dataArray: list[list[str]], labels: list[str], paddingSpace
                 
     return result
     
-def getRowSpacer(templateArray: list[int], corner: str = "+", spacer: str = "-", edgeDelim: bool = True) -> str:
+def getRowSpacer(templateArray: List[int], corner: str = "+", spacer: str = "-", edgeDelim: bool = True) -> str:
     """
     Returns a string row of values as a row in tables, using labels to make the cell width.
     
     Args:
-        templateArray (list[int]): List used as template for width of columns.
+        templateArray (List[int]): List used as template for width of columns.
         corner (str, optional): Corner symbol of a cell. Defaults to "+".
         spacer (str, optional): Main symbol of the spacer. Defaults to "-".
         edgeDelim (bool, optional): Should include starting deliminator? Defaults to False.
@@ -138,13 +140,13 @@ def getRowSpacer(templateArray: list[int], corner: str = "+", spacer: str = "-",
     row += corner if edgeDelim else ""
     return row
 
-def asTableRow(dataArray: list[str], templateArray: list[int], delim: str = " | ", edgeDelim: bool = True) -> str:
+def asTableRow(dataArray: List[str], templateArray: List[int], delim: str = " | ", edgeDelim: bool = True) -> str:
     """
     Returns a string row of values as a row in tables, using labels to make the cell width.
     
     Args:
-        dataArray (list[list[str]]): 1D list of data to put in row.
-        templateArray (list[int]): List used as template for width of columns.
+        dataArray (List[List[str]]): 1D List of data to put in row.
+        templateArray (List[int]): List used as template for width of columns.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
         edgeDelim (bool, optional): Should include starting deliminator? Defaults to False.
 
@@ -164,14 +166,14 @@ def asTableRow(dataArray: list[str], templateArray: list[int], delim: str = " | 
     row += delim if edgeDelim else ""
     return row
 
-def asTable(dataArray: list[list[str]], labels: list[str], delim: str = "|",
+def asTable(dataArray: List[List[str]], labels: List[str], delim: str = "|",
             edgeDelim: bool = True, includeRowDividers: bool = False, alternateRowColor: BashColor = BashColor.NONE) -> str:
     """
     Returns a string formatted as a table.
 
     Args:
-        dataArray (list[list[str]]): 2D list of lists of rows to put in table.
-        labels (list[str], optional): 1D list of labels per column, also used as template for width of columns.
+        dataArray (List[List[str]]): 2D List of Lists of rows to put in table.
+        labels (List[str], optional): 1D List of labels per column, also used as template for width of columns.
         minColWidth (int, optional): Minimum column width. Defaults to 6.
         delim (str, optional): Deliminator or columns. Defaults to " | ".
         edgeDelim (bool, optional): Should include start and end deliminator? Defaults to False.
@@ -182,10 +184,10 @@ def asTable(dataArray: list[list[str]], labels: list[str], delim: str = "|",
         str: dataArray and labels as a table.
     """
     
-    if(not isinstance(dataArray, list) or not isinstance(dataArray[0], list)):
-        raise ArgumentException("asTable - argument dataArray was not a valid list of list of strings.")
-    if(not isinstance(labels, list)):
-        raise ArgumentException("asTable - argument labels was not a valid list of strings.")
+    if(not isinstance(dataArray, List) or not isinstance(dataArray[0], List)):
+        raise ArgumentException("asTable - argument dataArray was not a valid List of List of strings.")
+    if(not isinstance(labels, List)):
+        raise ArgumentException("asTable - argument labels was not a valid List of strings.")
 
     template = getMaxColumWidth(dataArray, labels)
     rowSpacer = getRowSpacer(template)
@@ -205,13 +207,13 @@ def asTable(dataArray: list[list[str]], labels: list[str], delim: str = "|",
         
     return tableString
 
-def printLists(data: list[list[str]], titles: list[str]) -> bool:
+def printLists(data: List[List[str]], titles: List[str]) -> bool:
     """
-    Prints all lists in data, with title before corresponding list.
+    Prints all Lists in data, with title before corresponding List.
 
     Args:
-        data (list[list[str]]): List if lists to print
-        titles (list[str]): List of titles, index 0 is title for data list index 0 etc.
+        data (List[List[str]]): List if Lists to print
+        titles (List[str]): List of titles, index 0 is title for data List index 0 etc.
 
     Returns:
         bool: Result.
@@ -277,7 +279,7 @@ def printFinishedProgressBar(barLength: int = 20) -> None:
     
     printProgressBar(100, 100, barLength)
 
-def runFunctionWithSpinner(function: any, arguments: tuple[()]) -> None:
+def runFunctionWithSpinner(function: any, arguments: tuple) -> None:
     """
     Run a function and display a spinner in the CLI.
     E.g.: asyncResult = runFunctionWithSpinner(function = countSeconds, arguments = (10, "Count seconds completed!")).
