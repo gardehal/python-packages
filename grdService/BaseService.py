@@ -1,5 +1,5 @@
 import uuid
-from typing import Generic, TypeVar
+from typing import List, Generic, TypeVar
 
 from grdUtil.DateTimeUtil import getDateTime
 from grdUtil.BashColor import BashColor
@@ -121,7 +121,7 @@ class BaseService(Generic[T]):
         else:
             return entity
 
-    def getAll(self, includeSoftDeleted: bool = False) -> list[T]:
+    def getAll(self, includeSoftDeleted: bool = False) -> List[T]:
         """
         Get all entity Ts.
 
@@ -129,7 +129,7 @@ class BaseService(Generic[T]):
             includeSoftDeleted (bool): should include soft-deleted entities.
 
         Returns:
-            list[T]: Ts in storage.
+            List[T]: Ts in storage.
         """
 
         entities = self.entityRepository.getAll()
@@ -143,7 +143,7 @@ class BaseService(Generic[T]):
             
         return result
         
-    def getAllIds(self, includeSoftDeleted: bool = False) -> list[str]:
+    def getAllIds(self, includeSoftDeleted: bool = False) -> List[str]:
         """
         Get all IDs of entities.
 
@@ -151,7 +151,7 @@ class BaseService(Generic[T]):
             includeSoftDeleted (bool): Should include soft-deleted entities?
 
         Returns:
-            list[str]: IDs as list[str] from storage.
+            List[str]: IDs as List[str] from storage.
         """
         
         all = self.getAll(includeSoftDeleted)
