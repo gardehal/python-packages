@@ -15,6 +15,12 @@ Collection of general Python functions.
 1. Purge (external) packages
     - $ `python -m pip cache purge`
 
+## Errors
+
+- Colours not showing in printX functions, getting "←[92m" or similar codes at start of lines
+  - Make sure you're using a shell that can render colours, like Git Bash
+  - Enter $ `export FORCE_COLOR=true` in the shell and close, then open the shell
+
 ## TODO
 
 - asTable should have an option to not use labels, data as columns, not rows - use lists issue?
