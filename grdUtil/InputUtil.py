@@ -216,11 +216,9 @@ def joinAsString(*args) -> str:
 
     result = ""
     for a in args:
-        print(a)
         if(isinstance(a, List)):
             a = joinAsString(*a)
         
-        print(a)
         result += str(a)
     
     return result
