@@ -24,11 +24,6 @@ Collection of general Python functions.
 ## TODO
 
 - respect max width of terminal window
-- printS and printD NEED sys.stdout.flush()
-- move withmaxlenth to util, extension method?
-- sanitize make replacement an arg
-- setting for turning off print formatting (printS, printD)
-- extractArgs must allow None and not escape it to string "None"
 
 - asTable should have an option to not use labels, data as columns, not rows - use lists issue?
 - logutil, missing JSON logging

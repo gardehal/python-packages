@@ -32,14 +32,17 @@ def extractArgs(currentArgsIndex: int, args: List[str], numbersOnly: bool = Fals
         if(arg.startswith(flagIndicator)):
             break
         if(numbersOnly and not isNumber(arg)):
-            printS("Argument ", arg, " is not a number.")
+            printS("Argument ", arg, " is not a number.", color = BashColor.FAIL)
             continue
         if(pathsOnly and not os.path.exists(arg)):
-            printS("Argument ", arg, " is not a file path.")
+            printS("Argument ", arg, " is not a file path.", color = BashColor.FAIL)
             continue
         if(urlsOnly and not validators.url(arg)):
-            printS("Argument ", arg, " is not a url.")
+            printS("Argument ", arg, " is not a url.", color = BashColor.FAIL)
             continue
+        
+        if(arg == "None" or arg == "Null"):
+            arg = None
 
         result.append(arg)
     return result
