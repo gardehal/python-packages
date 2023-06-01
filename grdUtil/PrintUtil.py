@@ -25,7 +25,7 @@ def enablePrint():
     """
     sys.stdout = sys.__stdout__
 
-def printS(*args: any, color: BashColor = None, doPrint: bool = True) -> None:
+def printS(*args: any, color: BashColor = None, doPrint: bool = True, enableStyle: bool = True) -> None:
     """
     Concat all arguments and prints them as string (delim not included).
 
@@ -33,19 +33,21 @@ def printS(*args: any, color: BashColor = None, doPrint: bool = True) -> None:
         args (any): Items to print.
         color (BashColor, optional): Color from colors-dictionary. Defaults to None (no color).
         doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
+        enableStyle (bool, optional): Should style (coloured text, background colours etc.). Defaults to True.
     """
     
     if(not doPrint):
         return None
     
     message = "".join([str(m) for m in args])
-    if(color):
+    if(color and enableStyle):
         message = wrapColor(message, color)
 
     print(message)
+    sys.stdout.flush()
     return None
         
-def printD(*args, color: BashColor = BashColor.WARNING, debug: bool = True) -> None:
+def printD(*args, color: BashColor = BashColor.WARNING, debug: bool = True, enableStyle: bool = True) -> None:
     """
     Concat all arguments and prints them as string (delim not included) in a DEBUG format.
     
@@ -54,13 +56,14 @@ def printD(*args, color: BashColor = BashColor.WARNING, debug: bool = True) -> N
     Args:
         color (BashColor, optional): Color from colors-dictionary. Defaults to None (no color).
         doPrint (bool, optional): Should text be printed, useful for debug messages. Defaults to True.
+        enableStyle (bool, optional): Should style (coloured text, background colours etc.). Defaults to True.
     """
     
     currentFrame = inspect.currentframe()
     callerFrame = inspect.getouterframes(currentFrame, 2)
     parentMethodName = callerFrame[1][3]
     
-    return printS("DEBUG: ", parentMethodName, " - ", *args, color = color, doPrint = debug)
+    return printS("DEBUG: ", parentMethodName, " - ", *args, color = color, doPrint = debug, enableStyle = enableStyle)
 
 def wrapColor(text: str, color: BashColor, overrideColor: str = None) -> str:
     """
