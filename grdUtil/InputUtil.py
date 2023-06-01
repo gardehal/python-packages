@@ -8,6 +8,7 @@ from grdException.ArgumentException import ArgumentException
 
 from .BashColor import BashColor
 from .PrintUtil import printS
+from .StrUtil import joinAsString
 
 
 def extractArgs(currentArgsIndex: int, args: List[str], numbersOnly: bool = False, pathsOnly: bool = False, urlsOnly: bool = False, flagIndicator: str = "-") -> List[str]:
@@ -143,7 +144,7 @@ def getIfExists(array: List[any], index: int, default: any = None) -> any:
     """
     return array[index] if len(array) >= index + 1 else default
 
-def sanitize(*args, mode: int = 1) -> str:
+def sanitize(*args, mode: int = 1, subValue: str = "") -> str:
     """
     Sanitize a series of values and return them as a single string.
     Modes:
@@ -156,6 +157,7 @@ def sanitize(*args, mode: int = 1) -> str:
     Args:
         args (*args): Any values to sanitize and return as string.
         mode (int, optional): Mode to use. Defaults to 1.
+        subValue (str, optional): Value to replace bad characters with. Defaults to "".
 
     Returns:
         str: Concatenated, sanitized result.
@@ -171,11 +173,11 @@ def sanitize(*args, mode: int = 1) -> str:
     
     string = joinAsString(okArgs)
     if(mode == 0):
-        return re.sub("[^a-zA-Z0-9]", "", string)
-    if(mode == 1):
-        return re.sub("[^a-zA-Z0-9\s]", "", string)
-    if(mode == 2):
-        return re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", "", string)
+        return re.sub("[^a-zA-Z0-9]", subValue, string)
+    elif(mode == 1):
+        return re.sub("[^a-zA-Z0-9\s]", subValue, string)
+    elif(mode == 2):
+        return re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", subValue, string)
             
     return string
 
@@ -203,6 +205,7 @@ def getEnumFromValueName(enumType: Enum, valueName: str) -> Enum:
     else:
         raise ArgumentException(f"{valueName} is not a valid {enumType.__name__} option.")
 
+# Being moved to StrUtil...
 def joinAsString(*args) -> str:
     """
     Join all args as string and return the resulting single string.
