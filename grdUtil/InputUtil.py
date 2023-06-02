@@ -154,8 +154,7 @@ def sanitize(*args, mode: int = 1, subValue: str = "") -> str:
     0 - replace everything except latin alphanumerical symbols and space
     1 - replace everything except latin alphanumerical symbols, whitespace (\\s) 
     2 - replace everything except latin alphanumerical symbols, whitespace (\\s), and common symbols like < > , . _ - : ; * ^ ! " ' # % & /   (  ) [ ] = + ?
-    TODO - replace commonly known escape characters
-    TODO - replace only worst of escape characters
+    3 - replace everything not allowed in Windows path names
 
     Args:
         args (*args): Any values to sanitize and return as string.
@@ -176,11 +175,13 @@ def sanitize(*args, mode: int = 1, subValue: str = "") -> str:
     
     string = joinAsString(okArgs)
     if(mode == 0):
-        return re.sub("[^a-zA-Z0-9]", subValue, string)
+        return re.sub(r"""[^a-zA-Z0-9]""", subValue, string)
     elif(mode == 1):
-        return re.sub("[^a-zA-Z0-9\s]", subValue, string)
+        return re.sub(r"""[^a-zA-Z0-9\s]""", subValue, string)
     elif(mode == 2):
-        return re.sub("[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]", subValue, string)
+        return re.sub(r"""[^a-zA-Z0-9\s\<\>\,\.\_\-\:\;\*\^\!\"\'\#\%\&\/\\\(\)\[\]\=\+\?]""", subValue, string)
+    elif(mode == 3):
+        return re.sub(r"""[<>:"\/\|?*]""", subValue, string)
             
     return string
 
