@@ -47,7 +47,7 @@ def extractArgs(currentArgsIndex: int, args: List[str], numbersOnly: bool = Fals
         result.append(arg)
     return result
 
-def getIdsFromInput(args: List[str], existingIds: List[str], indexList: List[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = True, debug: bool = False) -> List[str]:
+def getIdsFromInput(args: List[str], existingIds: List[str], indexList: List[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = True, startAtZero: bool = True, debug: bool = False) -> List[str]:
     """
     Get IDs from a List of inputs, whether they are raw IDs that must be checked via the database or indices (formatted "i[index]") of a List. 
     This defaults to the first element in existingIds if input is empty if setDefaultId is True.
@@ -59,6 +59,7 @@ def getIdsFromInput(args: List[str], existingIds: List[str], indexList: List[any
         limit (int): Limit the numbers of arguments to parse.
         returnOnNonIds (bool): Return valid input IDs if the current input is no an ID, to allow input from user to be something like \"id id id bool\" which allows unspecified IDs before other arguments.
         setDefaultId (bool): Should a default ID be picked (first)?
+        startAtZero (bool): Should indices start at zero? If False, first element in indexList will be i1, if True, it will be i0, etc.
         debug (bool): Should debug-information be printed?
 
     Returns:
@@ -89,6 +90,9 @@ def getIdsFromInput(args: List[str], existingIds: List[str], indexList: List[any
                 continue
 
             index = int(float(arg[1:]))
+            if(not startAtZero):
+                index = index - 1 if index > 0 else 0
+                
             indexedEntity = getIfExists(indexList, index)
 
             if(indexedEntity != None):
