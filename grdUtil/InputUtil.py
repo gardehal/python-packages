@@ -50,7 +50,7 @@ def extractArgs(currentArgsIndex: int, args: List[str], numbersOnly: bool = Fals
         result.append(arg)
     return result
 
-def getCommandFlags(self, arguments: List[str], flagAliases: List[str], argsToTake: int = None, defaultFoundValue: any = None, defaultValue: any = None, debug: bool = False) -> FlagValues:
+def getCommandFlags(arguments: List[str], flagAliases: List[str], argsToTake: int = None, defaultFoundValue: any = None, defaultValue: any = None, debug: bool = False) -> FlagValues:
     """
     Prase though arguments for flag aliases and return values for given aliases. 
         Intended to be used like: 
