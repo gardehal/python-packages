@@ -23,6 +23,7 @@ Collection of general Python functions.
 
 ## TODO
 
+- fix pylance not recognizing this, temp fix by adding project to ctrl+, then extrapaths
 - respect max width of terminal window
 - asTable should have an option to not use labels, data as columns, not rows - use lists issue?
 - logutil, missing JSON logging

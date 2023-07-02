@@ -4,10 +4,13 @@ from enum import Enum
 from typing import List
 
 import validators
+
 from grdException.ArgumentException import ArgumentException
 
 from .BashColor import BashColor
-from .PrintUtil import printS
+from .FlagValues import FlagValues
+from .ListUtil import intersectIndices
+from .PrintUtil import printD, printS
 from .StrUtil import joinAsString
 
 
@@ -29,7 +32,7 @@ def extractArgs(currentArgsIndex: int, args: List[str], numbersOnly: bool = Fals
     
     result = []
     for arg in args[currentArgsIndex + 1:]:
-        if(arg.startswith(flagIndicator)):
+        if(flagIndicator != None and arg.startswith(flagIndicator)):
             break
         if(numbersOnly and not isNumber(arg)):
             printS("Argument ", arg, " is not a number.", color = BashColor.FAIL)
@@ -45,6 +48,83 @@ def extractArgs(currentArgsIndex: int, args: List[str], numbersOnly: bool = Fals
             arg = None
 
         result.append(arg)
+    return result
+
+def getCommandFlags(self, arguments: List[str], flagAliases: List[str], argsToTake: int = None, defaultFoundValue: any = None, defaultValue: any = None, debug: bool = False) -> FlagValues:
+    """
+    Prase though arguments for flag aliases and return values for given aliases. 
+        Intended to be used like: 
+            myFlagIncluded: bool = getCommandFlags(arguments = ["some", "commands", "-myFlag", "further", "commands"], flagAliases = ["-myFlag", "-flag"], defaultFoundValue = True, defaultValue = False).values[0]
+            ingredientsToAdd: List[str] = getCommandFlags(arguments = ["generate", "fruitSalad", "add", "apples", "grapes"], ["add"]).values
+            replayTimes: int = int(getCommandFlags(arguments = ["play", "nature_sounds.mp3", "-replay", "3", "-filter", "rain_light"], ["replay"], argsToTake = 1, defaultValue = 0).values[0])
+
+    Args:
+        arguments (List[str]): Arguments to parse.
+        flagAliases (List[str]): Aliases of flags to get values for.
+        argsToTake (int): Number of arguments that follow the flag aliases in arguments. Default None, not used.
+        defaultFoundValue (any): Any value that is the default if the flag is found. If set, function will ignore any input after first flag and immediately return defaultValue. Default None, not used.
+        defaultValue (any): Any value that is the default if the flag is NOT found. If set, function will ignore any input after first flag and immediately return defaultValue. Default None, not used.
+        debug (bool): Print debug lines. Default False.
+
+    Returns:
+        FlagValues: Values for given flags, further info for parsed args.
+    """
+    
+    flagIndices = intersectIndices(arguments, flagAliases)
+    printD("flagIndices: ", flagIndices, debug = debug)
+    flagIndex = flagIndices[0] if(len(flagIndices) > 0) else None
+    printD("flagIndex: ", flagIndex, debug = debug)
+    nextArgumentsIndex = flagIndex + 1 if(flagIndex != None) else None
+    printD("nextArgumentsIndex: ", nextArgumentsIndex, debug = debug)
+    
+    result = FlagValues(found = False,
+        values = [],
+        flagIndex = flagIndex,
+        valueIndices = [],
+        argumentsConsumed = 0,
+        previousArguments = arguments[:flagIndex] if(flagIndex != None) else [],
+        nextArguments = arguments[nextArgumentsIndex:],
+        arguments = arguments,
+        flagAliases = flagAliases,
+        defaultValue = defaultValue)
+    
+    # No flags found and defaultValue is set, return defaultValue
+    if(len(flagIndices) == 0 and defaultValue != None):
+        printD("No flags found, returning defaultValue", debug = debug)
+        result.values = [defaultValue]
+        return result
+    
+    # No flags found, return no values
+    if(len(flagIndices) == 0):
+        printD("No flags found, returning basic FlagValues", debug = debug)
+        return result
+    
+    result.found = True
+    # Flag found and defaultFoundValue is set, return defaultFoundValue
+    if(defaultFoundValue != None):
+        printD("Returning defaultFoundValue", debug = debug)
+        result.values = [defaultFoundValue]
+        result.argumentsConsumed = 1 # Flag counted as only argument consumed
+        return result
+    
+    firstValueIndex = flagIndex + 1
+    printD("firstValueIndex: ", firstValueIndex, debug = debug)
+    # Flag found and argsToTake is set, return argsToTake number of arguments after flag
+    if(argsToTake != None):
+        printD("Returning argsToTake values following flag", debug = debug)
+        result.values = arguments[firstValueIndex:firstValueIndex + argsToTake]
+        result.valueIndices = [i + firstValueIndex for i in range(len(result.values))]
+        result.argumentsConsumed = len(result.values) + 1 # Values + flag
+        result.nextArguments = arguments[flagIndex + result.argumentsConsumed:]
+        return result
+    
+    # Flag found, return all arguments following
+    printD("Returning all values following flag", debug = debug)
+    result.values = arguments[firstValueIndex:]
+    result.valueIndices = [i + firstValueIndex for i in range(len(result.values))]
+    result.argumentsConsumed = len(result.values) + 1 # Values + flag
+    result.nextArguments = arguments[flagIndex + result.argumentsConsumed:]
+    
     return result
 
 def getIdsFromInput(args: List[str], existingIds: List[str], indexList: List[any], limit: int = None, returnOnNonIds: bool = False, setDefaultId: bool = True, startAtZero: bool = True, debug: bool = False) -> List[str]:
@@ -126,6 +206,9 @@ def isNumber(n: any, intOnly: bool = False) -> bool:
     Returns:
         bool: Result.
     """
+    
+    if(n == None):
+        return False
     
     try:
         float(n)
