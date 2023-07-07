@@ -4,7 +4,7 @@ import sys
 import threading
 import time
 import traceback
-from typing import List
+from typing import Iterable, List
 
 from grdException.ArgumentException import ArgumentException
 
@@ -25,7 +25,7 @@ def enablePrint():
     """
     sys.stdout = sys.__stdout__
 
-def printS(*args: any, color: BashColor = None, doPrint: bool = True, enableStyle: bool = True) -> None:
+def printS(*args: any, color: BashColor = None, doPrint: bool = True, enableStyle: bool = True, end: str = "\n") -> None:
     """
     Concat all arguments and prints them as string (delim not included).
 
@@ -43,7 +43,7 @@ def printS(*args: any, color: BashColor = None, doPrint: bool = True, enableStyl
     if(color and enableStyle):
         message = wrapColor(message, color)
 
-    print(message)
+    print(message, end = end)
     sys.stdout.flush()
     return None
         
@@ -232,7 +232,7 @@ def printLists(data: List[List[str]], titles: List[str]) -> bool:
             
     return True
 
-def printSpinner(pause: float = 0.2) -> None:
+def printSpinner(pause: float = 0.2, color: BashColor = None) -> None:
     """
     Print one rotation of a spinner to inform the user that the program is working. This method must be constantly called to keep the spinner going.
     
@@ -240,20 +240,34 @@ def printSpinner(pause: float = 0.2) -> None:
         pause (float): Pause between between change in the spinner in seconds
     """
     
-    print(" - ", end = "\r")
-    sys.stdout.flush()
+    # TODO will complete one rotation every time called, should be some abort or return callback to stop spinning when async task finishes
+    printS(" - ", color = color, end = "\r")
     time.sleep(pause)
-    print(" \\ ", end = "\r")
-    sys.stdout.flush()
+    printS(" \\ ", color = color, end = "\r")
     time.sleep(pause)
-    print(" | ", end = "\r")
-    sys.stdout.flush()
+    printS(" | ", color = color, end = "\r")
     time.sleep(pause)
-    print(" / ", end = "\r")
-    sys.stdout.flush()
+    printS(" / ", color = color, end = "\r")
     time.sleep(pause)
 
-def printProgressBar(current: float, total: float, barLength: int = 20) -> None:
+def printProgressText(text: str, pause: float = 0.5, color: BashColor = None) -> None:
+    """
+    Print one rotation of a spinner to inform the user that the program is working. This method must be constantly called to keep the spinner going.
+    
+    Args:
+        pause (float): Pause between between change in the spinner in seconds
+    """
+    
+    printS(text, color = color, end = "\r")
+    time.sleep(pause)
+    printS(text, ".", color = color, end = "\r")
+    time.sleep(pause)
+    printS(text, "..", color = color, end = "\r")
+    time.sleep(pause)
+    printS(text, "...", color = color, end = "\r")
+    time.sleep(pause)
+
+def printProgressBar(current: float, total: float, barLength: int = 20, color: BashColor = None) -> None:
     """
     Print a progress bar.
     Source: https://stackoverflow.com/questions/6169217/replace-console-output-in-python
@@ -265,13 +279,12 @@ def printProgressBar(current: float, total: float, barLength: int = 20) -> None:
     """
     
     percent = float(current) * 100 / total
-    arrow   = "-" * int(percent/100 * barLength - 1) + ">"
+    arrow   = "-" * int(percent / 100 * barLength - 1) + ">"
     spaces  = " " * (barLength - len(arrow))
 
-    print(f"Progress: [{arrow}{spaces}] {int(percent)}%", end = "\r")
-    sys.stdout.flush()
+    printS(f"Progress: [{arrow}{spaces}] {int(percent)}%", color = color, end = "\r")
     
-def printFinishedProgressBar(barLength: int = 20) -> None:
+def printFinishedProgressBar(barLength: int = 20, color: BashColor = None) -> None:
     """
     Print a finished progress bar for display purposes.
     Source: https://stackoverflow.com/questions/6169217/replace-console-output-in-python
@@ -280,23 +293,25 @@ def printFinishedProgressBar(barLength: int = 20) -> None:
         barLength (int, optional): Total displayed length. Defaults to 20.
     """
     
-    printProgressBar(100, 100, barLength)
+    printProgressBar(100, 100, barLength, color)
 
-def runFunctionWithSpinner(function: any, arguments: tuple) -> None:
+def runFunctionWithSpinner(function: any, arguments: Iterable[any], color: BashColor = None) -> None:
     """
     Run a function and display a spinner in the CLI.
-    E.g.: asyncResult = runFunctionWithSpinner(function = countSeconds, arguments = (10, "Count seconds completed!")).
+    E.g.: asyncResult = runFunctionWithSpinner(function = countSeconds, arguments = [10, "Count seconds completed!"]).
 
     Args:
-        function (method): Function to run.
-        arguments (tuple): Arguments to pass to function.
+        function (any): Function to run.
+        arguments (Iterable[any]): Iterable of arguments to pass to function, positional.
     """
     
     funcThread = threading.Thread(target = function, args = arguments)
     funcThread.start()
     
     while funcThread.is_alive():
-        printSpinner()
+        printSpinner(color = color)
+        
+    printS("   ")
 
 def printStack(color: BashColor = BashColor.WARNING, doPrint: bool = True) -> None:
     """
