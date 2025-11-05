@@ -1,26 +1,40 @@
 import os
 
 class FilePathObject():
-    def __init__(self, isFile: bool = False, fullPath: str = "", directory: str = "", relativePath: str = "", fileLeaf: str = "", filename: str = "", fileRoot: str = "", extension: str = "", extensionWithDot: str = ""):
-        self.isFile: bool = isFile
-        self.fullPath: str = fullPath
-        self.directory: str = directory
-        self.relativePath: str = relativePath
-        self.fileLeaf: str = fileLeaf
-        self.filename: str = filename
-        self.fileRoot: str = fileRoot
-        self.extension: str = extension
-        self.extensionWithDot: str = extensionWithDot
-        self.inputPath: str = fullPath
-        self.inputPathClean: str = fullPath
+    isFile: bool
+    fullPath: str
+    directory: str
+    relativePath: str
+    fileLeaf: str
+    filename: str
+    fileRoot: str
+    extension: str
+    extensionWithDot: str
+    inputPath: str
+    inputPathClean: str
+    fileExists: bool
 
     def __init__(self, filePath: str, debug: bool = False):
+        """
+        Initialize FilePathObject, assigning all the path items.
+        See help() for more naming details.
+
+        Args:
+            filePath (str): path to file, absolute or relative, can be a non-existent file, but if exists, must be a file.
+            debug (bool, optional): Print debug data. Defaults to False.
+
+        Returns:
+            FilePathObject: FilePathObject
+        """
         if(filePath == None):
             if(debug): print("FilePathObject: Argument path is None.")
             self.isFile = False
             return None
 
-        if(not os.path.isfile(filePath)):
+        if(not os.path.exists(filePath)):
+            self.fileExists = False
+
+        if(self.fileExists and not os.path.isfile(filePath)):
             if(debug): print("FilePathObject: Argument path is not a dir or file.")
             self.isFile = False
             return None
@@ -29,14 +43,19 @@ class FilePathObject():
 
         fullPath = None
         relativePath = None
-        if(os.path.isabs(sanitizedFilePath)):
-            if(debug): print("FilePathObject: Argument path is absolute.")
-            fullPath = sanitizedFilePath
-            relativePath = os.path.realpath(fullPath)
-        else:
-            if(debug): print("FilePathObject: Argument path is relative.")
-            fullPath = os.path.abspath(sanitizedFilePath)
-            relativePath = sanitizedFilePath
+        if(self.fileExists):
+            if(os.path.isabs(sanitizedFilePath)):
+                if(debug): 
+                    print("FilePathObject: Argument path is absolute.")
+                
+                fullPath = sanitizedFilePath
+                relativePath = os.path.realpath(fullPath)
+            else:
+                if(debug): 
+                    print("FilePathObject: Argument path is relative.")
+                
+                fullPath = os.path.abspath(sanitizedFilePath)
+                relativePath = sanitizedFilePath
         
         self.isFile: bool = True
         self.fullPath: str = fullPath
@@ -47,10 +66,11 @@ class FilePathObject():
         self.fileRoot: str = ".".join(self.filename.split(".")[:-1])
         self.extension: str =  fullPath.split(".")[-1] if ("." in fullPath) else ""
         self.extensionWithDot: str = f".{self.extension}"
-        self.inputPath: str = sanitizedFilePath
+        self.inputPath: str = filePath
         self.inputPathClean: str = sanitizedFilePath
 
-        if(debug): print("FilePathObject: No errors.")
+        if(debug): 
+            print("FilePathObject: No errors.")
 
     def help():
         """
