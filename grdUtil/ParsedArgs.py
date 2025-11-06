@@ -16,7 +16,8 @@ class ArgHead():
     
     def validate(self, input: str) -> ArgsResult:
         # combine prefix and flag aliases
-        # find positional and named argvalues
+        # find flag in input string if any
+        # find positional and named argvalues if any
         # combine and return ArgsResult
         
         return ArgsResult()
