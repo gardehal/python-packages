@@ -5,22 +5,42 @@ class ArgHead():
     Holder of all flags and args
     """
     
+    flags: list[Flag]
     flagPrefix: str
     namedArgDelim: str
-    flags: list[Flag]
+    argDelum: str
     
-    def __init__(self, flagPrefix: str = "-", namedArgDelim: str = ":", flags: list[Flag] = []):
+    def __init__(self, flags: list[Flag], flagPrefix: str = "-", namedArgDelim: str = ":", argDelum: str = " "):
+        self.flags = flags
         self.flagPrefix = flagPrefix
         self.namedArgDelim = namedArgDelim
-        self.flags = flags
+        self.argDelum = argDelum
     
-    def validate(self, input: str) -> ArgsResult:
-        # combine prefix and flag aliases
-        # find flag in input string if any
-        # find positional and named argvalues if any
-        # combine and return ArgsResult
+    def validate(self, input: str) -> list[ArgsResult]:
         
-        return ArgsResult()
+        result = []
+        
+        inputSplit = input.split(self.argDelum)
+        for flag in self.flags.alias:
+            prefixedAlias = [f"{self.flagPrefix}{e}" for e in flag.alias]
+            for alias in prefixedAlias:
+                flagIndex = inputSplit.index(alias)
+                if(flagIndex):
+                    potentialArguments = inputSplit[flagIndex+1:]
+                    nextFlagIndex = potentialArguments.index(fr"{self.argDelum}{self.flagPrefix}.*")
+                    arguments = potentialArguments[:nextFlagIndex]
+                    
+                    argResult = ArgResult(flag.name, flag.hitValue, flagIndex, [], [], inputSplit[nextFlagIndex:])
+                    for argument in arguments:
+                        print(argument)
+                        #find positional arguments, prioritized - ignore named args? include named args in position? 
+                        #find named arguments
+                        # argResult.argValues.append()
+                        # argResult.unhandledInputs.append()
+                        
+                    result.append(argResult)
+        
+        return result
     
 class Flag():
     """
@@ -34,7 +54,7 @@ class Flag():
     argValues: list[ArgValue]
     hitValue: str # any
     
-    def __init__(self, name: str, order: int, alias: list[str], argValues: list[ArgValue], hitValue: str):
+    def __init__(self, name: str, order: int, alias: list[str], hitValue: str):
         self.name = name
         self.order = order
         self.alias = alias
@@ -66,14 +86,16 @@ class ArgsResult():
     Returns of validate, with info of what flag was hit, what values was added, where it was in the input string, what to parse next for the caller
     """
     flagName: str
-    flagIndex: int
     hitValue: str # any
+    flagIndex: int
     argValues: list[ArgValue] # struct? str:any?
+    unhandledInputs: list[str]
     nextInput: str
 
-    def __init__(self, flagName: str, flagIndex: int, hitValue: str, argValues: list[ArgValue], nextInput: str):
+    def __init__(self, flagName: str, hitValue: str, flagIndex: int, argValues: list[ArgValue], unhandledInputs: list[str], nextInput: str):
         self.flagName = flagName
-        self.flagIndex = flagIndex
         self.hitValue = hitValue
+        self.flagIndex = flagIndex
         self.argValues = argValues
+        self.unhandledInputs = unhandledInputs
         self.nextInput = nextInput
