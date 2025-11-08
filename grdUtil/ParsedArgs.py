@@ -17,6 +17,9 @@ class ArgHead():
         self.argDelum = argDelum
     
     def validate(self, input: str) -> list[ArgsResult]:
+        """
+        Validate input and return list of ArgResults found, with arguments.
+        """
         
         result = []
         
@@ -31,9 +34,17 @@ class ArgHead():
                     arguments = potentialArguments[:nextFlagIndex]
                     
                     argResult = ArgResult(flag.name, flag.hitValue, flagIndex, [], [], inputSplit[nextFlagIndex:])
-                    for argument in arguments:
-                        print(argument)
+                    namedArgs = {}
+                    for argValue in flag.argValues:
+                        # for argument in arguments, intersect with flag.argValues + self.namedArgDelim
+                        # if match, add to namedArgs dict as argValue.name: argument.split(self.namedArgDelim)[1], if empty, use None? assume next arg is value?
+                        
+                        # if(argument in [f"{e}{self.namedArgDelim}" for e in argValue.alias]):
+                        # print(argument)
+                        
+                        
                         #find positional arguments, prioritized - ignore named args? include named args in position? 
+                        # - get and removed named, then check positional
                         #find named arguments
                         # argResult.argValues.append()
                         # argResult.unhandledInputs.append()
