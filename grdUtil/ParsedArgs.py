@@ -23,15 +23,16 @@ class ArgHead():
         
         result = []
         
+        # TODO reduce foreaches
         inputSplit = input.split(self.argDelum)
         for flag in self.flags.alias:
             prefixedAlias = [f"{self.flagPrefix}{e}" for e in flag.alias]
             for alias in prefixedAlias:
                 flagIndex = inputSplit.index(alias)
                 if(flagIndex):
-                    potentialArguments = inputSplit[flagIndex+1:]
-                    nextFlagIndex = potentialArguments.index(fr"{self.argDelum}{self.flagPrefix}.*")
-                    arguments = potentialArguments[:nextFlagIndex]
+                    potentialArgs = inputSplit[flagIndex+1:]
+                    nextFlagIndex = potentialArgs.index(fr"{self.argDelim}{self.flagPrefix}.*")
+                    args = potentialArgs[:nextFlagIndex]
                     
                     argResult = ArgResult(flag.name, flag.hitValue, flagIndex, [], [], inputSplit[nextFlagIndex:])
                     namedArgs = {}
@@ -39,9 +40,12 @@ class ArgHead():
                         # for argument in arguments, intersect with flag.argValues + self.namedArgDelim
                         # if match, add to namedArgs dict as argValue.name: argument.split(self.namedArgDelim)[1], if empty, use None? assume next arg is value?
                         
-                        # if(argument in [f"{e}{self.namedArgDelim}" for e in argValue.alias]):
-                        # print(argument)
-                        
+                        argAlias = [f"{e}{self.namedArgDelim}" for e in argValue.alias]
+                        argumentKeys = [e for e in args if(e.__contains__(self.namedArgDelim))]
+                        for arg in args:
+                            print(arg)
+                            if(arg in argAlias):
+                                namedArgs[arg.split(self.namedArgDelim)[0]: args[args.index(arg) + 1]] # awful
                         
                         #find positional arguments, prioritized - ignore named args? include named args in position? 
                         # - get and removed named, then check positional
