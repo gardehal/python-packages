@@ -32,27 +32,22 @@ class ArgHead():
                 if(commandIndex):
                     potentialArgs = inputSplit[commandIndex+1:]
                     nextCommandIndex = potentialArgs.index(fr"{self.argDelim}{self.commandPrefix}.*")
-                    args = potentialArgs[:nextCommandIndex]
+                    argResult = ArgResult(command.name, command.hitValue, commandIndex, None, None, inputSplit[nextCommandIndex:])
                     
-                    argResult = ArgResult(command.name, command.hitValue, commandIndex, [], [], inputSplit[nextCommandIndex:])
-                    namedArgs = {}
+                    # Most of this in funcs(s)
+                    args = potentialArgs[:nextCommandIndex]
+                    namedArgs = [e for e in args if(self.namedArgDelim in e)]
+                    namedArgsDict = {}
+                    for value in namedArgs:
+                        key, value = value.split(self.namedArgDelim)
+                        namedArgsDict[key] = value
+                    
+                    resolvedArgValues = {}
+                    unhandledInputs = []
                     for argValue in command.argValues:
-                        # for argument in arguments, intersect with command.argValues + self.namedArgDelim
-                        # if match, add to namedArgs dict as argValue.name: argument.split(self.namedArgDelim)[1], if empty, use None? assume next arg is value?
-                        
-                        argAlias = [f"{e}{self.namedArgDelim}" for e in argValue.alias]
-                        argKeys = [e for e in args if(e.__contains__(self.namedArgDelim))]
-                        for key in argKeys:
-                            print(key)
-                            if(key in argAlias):
-                                namedArgs[key.split(self.namedArgDelim)[0]: args[args.index(key) + 1]] # awful
-                        
-                        #find positional arguments, prioritized - ignore named args? include named args in position? 
-                        # - get and removed named, then check positional
-                        #find named arguments
-                        # argResult.argValues.append()
-                        # argResult.unhandledInputs.append()
-                        
+                        foundNamedArgs = list(set(argValue.alias) & set(namedArgsDict.keys))
+                        if(not foundNamedArgs):
+                            continue
                     result.append(argResult)
         
         return result
@@ -60,8 +55,8 @@ class ArgHead():
 class Commands():
     """
     Designates commands
-    eg. height in 
-    $ -height value:100
+    eg. dimensions in 
+    $ -dimensions value:100
     """
     name: str
     order: int
@@ -78,8 +73,8 @@ class Commands():
 class ArgValue():
     """
     Designates values input as args to commands 
-    eg. value in 
-    $ -height value:100
+    eg. height in 
+    $ -dimensions height:100
     """
     name: str
     order: int
@@ -103,11 +98,11 @@ class ArgsResult():
     commandName: str
     hitValue: str # any
     commandIndex: int
-    argValues: list[ArgValue] # struct? str:any?
+    argValues: dict[str, any]
     unhandledInputs: list[str]
     nextInput: str
 
-    def __init__(self, commandName: str, hitValue: str, commandIndex: int, argValues: list[ArgValue], unhandledInputs: list[str], nextInput: str):
+    def __init__(self, commandName: str, hitValue: str, commandIndex: int, argValues: dict[str, any], unhandledInputs: list[str], nextInput: str):
         self.commandName = commandName
         self.hitValue = hitValue
         self.commandIndex = commandIndex
