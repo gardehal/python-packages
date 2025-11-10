@@ -48,6 +48,25 @@ class ArgHead():
                         foundNamedArgs = list(set(argValue.alias) & set(namedArgsDict.keys))
                         if(not foundNamedArgs):
                             continue
+                        
+                        foundNamedArg = foundNamedArgs[0]
+                        value = namedArgsDict[foundNamedArg]
+                        # validate using argValue.validators
+                        
+                        # try cast value to argValue.type T
+                        castValue = value
+                        # if(cast_failed):
+                        #     argResult.unhandledInputs.append(foundNamedArg)
+                        #     continue
+                        
+                        argResult.argValues[argValue.name] = castValue
+                    
+                    # deal with positional
+                    # positionalArgs = [e for e in args if(self.namedArgDelim not in e)]
+                    # can fold into argValues loop?
+                    
+                    argResult.argValues = resolvedArgValues
+                    argResult.unhandledInputs = unhandledInputs
                     result.append(argResult)
         
         return result
