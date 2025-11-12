@@ -1,5 +1,5 @@
 
-class ArgsResult():
+class ArgResult():
     """
     Returns of validate, with info of what command was hit, what values was added, where it was in the input string, what to parse next for the caller
     """

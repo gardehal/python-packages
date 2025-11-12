@@ -1,5 +1,5 @@
-from ArgsResult import ArgsResult
-from Commands import Command
+from .ArgResult import ArgResult
+from .Command import Command
 
 class Argumentor():
     """
@@ -9,31 +9,33 @@ class Argumentor():
     commands: list[Command]
     commandPrefix: str
     namedArgDelim: str
-    argDelim: str
+    inputDelim: str
     
-    def __init__(self, commands: list[Command], commandPrefix: str = "-", namedArgDelim: str = ":", argDelim: str = " "):
+    def __init__(self, commands: list[Command], commandPrefix: str = "-", namedArgDelim: str = ":", inputDelim: str = " "):
         self.commands = commands
         self.commandPrefix = commandPrefix
         self.namedArgDelim = namedArgDelim
-        self.argDelim = argDelim
+        self.inputDelim = inputDelim
     
-    def validate(self, input: str) -> list[ArgsResult]:
+        
+    def validate(self, input: str) -> list[ArgResult]:
+        return self.validate(input.split(self.inputDelim))
+        
+    def validate(self, input: list[str]) -> list[ArgResult]:
         """
         Validate input and return list of ArgResults found, with arguments.
         """
         
-        result = []
-        
         # TODO reduce foreaches
-        inputSplit = input.split(self.argDelim)
-        for command in self.commands.alias:
+        result = []
+        for command in self.commands:
             prefixedAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
             for alias in prefixedAlias:
-                commandIndex = inputSplit.index(alias)
+                commandIndex = input.index(alias)
                 if(commandIndex):
-                    potentialArgs = inputSplit[commandIndex+1:]
-                    nextCommandIndex = potentialArgs.index(fr"{self.argDelim}{self.commandPrefix}.*")
-                    argResult = ArgsResult(command.name, command.hitValue, commandIndex, None, None, inputSplit[nextCommandIndex:])
+                    potentialArgs = input[commandIndex+1:]
+                    nextCommandIndex = potentialArgs.index(fr"{self.inputDelim}{self.commandPrefix}.*")
+                    argResult = ArgResult(command.name, command.hitValue, commandIndex, None, None, input[nextCommandIndex:])
                     
                     # Most of this in funcs(s)
                     args = potentialArgs[:nextCommandIndex]

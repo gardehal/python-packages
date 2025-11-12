@@ -1,4 +1,4 @@
-from ArgValue import ArgValue
+from .ArgValue import ArgValue
 
 class Command():
     """
