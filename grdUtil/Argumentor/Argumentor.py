@@ -1,17 +1,17 @@
 from ArgsResult import ArgsResult
-from Commands import Commands
+from Commands import Command
 
 class Argumentor():
     """
     Holder of all commands and args
     """
     
-    commands: list[Commands]
+    commands: list[Command]
     commandPrefix: str
     namedArgDelim: str
     argDelim: str
     
-    def __init__(self, commands: list[Commands], commandPrefix: str = "-", namedArgDelim: str = ":", argDelim: str = " "):
+    def __init__(self, commands: list[Command], commandPrefix: str = "-", namedArgDelim: str = ":", argDelim: str = " "):
         self.commands = commands
         self.commandPrefix = commandPrefix
         self.namedArgDelim = namedArgDelim
