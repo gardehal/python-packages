@@ -10,10 +10,10 @@ class ArgResult():
     unhandledInputs: list[str]
     nextInput: str
 
-    def __init__(self, commandName: str, hitValue: object, commandIndex: int, argValues: dict[str, object], unhandledInputs: list[str], nextInput: str):
+    def __init__(self, commandName: str, hitValue: object, commandIndex: int):
         self.commandName = commandName
         self.hitValue = hitValue
         self.commandIndex = commandIndex
-        self.argValues = argValues
-        self.unhandledInputs = unhandledInputs
-        self.nextInput = nextInput
+        self.argValues = {}
+        self.unhandledInputs = []
+        self.nextInput = []
