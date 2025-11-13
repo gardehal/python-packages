@@ -23,53 +23,72 @@ class Argumentor():
         
     def validate(self, input: list[str]) -> list[ArgResult]:
         """
-        Validate input and return list of ArgResults found, with arguments.
+        Validate input and return list of ArgResults found, with arguments, if any are found.
         """
         
+        if(len(input) == 0):
+            return []
+        
         # TODO reduce foreaches
+        
+        commandRegex = fr"{self.commandPrefix}.*"
         result = []
         for command in self.commands:
             prefixedAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
             for alias in prefixedAlias:
+                if(alias not in input):
+                    continue
+                
                 commandIndex = input.index(alias)
-                if(commandIndex):
-                    potentialArgs = input[commandIndex+1:]
-                    nextCommandIndex = potentialArgs.index(fr"{self.inputDelim}{self.commandPrefix}.*")
-                    argResult = ArgResult(command.name, command.hitValue, commandIndex, None, None, input[nextCommandIndex:])
+                potentialArgs = input[commandIndex + 1:]
+                nextCommandIndex = 0
+                if(commandRegex in input):
+                    nextCommandIndex = potentialArgs.index(commandRegex)
                     
-                    # Most of this in funcs(s)
-                    args = potentialArgs[:nextCommandIndex]
-                    namedArgs = [e for e in args if(self.namedArgDelim in e)]
-                    namedArgsDict = {}
-                    for value in namedArgs:
-                        key, value = value.split(self.namedArgDelim)
-                        namedArgsDict[key] = value
+                argResult = ArgResult(command.name, command.hitValue, commandIndex)
+                
+                args = potentialArgs[:nextCommandIndex - 1]
+                namedArgs = [e for e in args if(self.namedArgDelim in e)]
+                namedArgsDict = {}
+                for value in namedArgs:
+                    key, value = value.split(self.namedArgDelim)
+                    namedArgsDict[key] = value
+                
+                print("debug")
+                print(input)
+                print(commandIndex)
+                print(potentialArgs)
+                print(nextCommandIndex)
+                print(args)
+                print(namedArgs)
+                print(namedArgsDict)
+                print("debug")
+                resolvedArgValues = {}
+                unhandledInputs = []
+                for argValue in command.argValues:
+                    foundNamedArgs = list(set(argValue.alias) & set([namedArgsDict.keys]))
+                    if(not foundNamedArgs):
+                        continue
                     
-                    resolvedArgValues = {}
-                    unhandledInputs = []
-                    for argValue in command.argValues:
-                        foundNamedArgs = list(set(argValue.alias) & set(namedArgsDict.keys))
-                        if(not foundNamedArgs):
-                            continue
-                        
-                        foundNamedArg = foundNamedArgs[0]
-                        value = namedArgsDict[foundNamedArg]
-                        # validate using argValue.validators
-                        
-                        # try cast value to argValue.type T
-                        castValue = value
-                        # if(cast_failed):
-                        #     argResult.unhandledInputs.append(foundNamedArg)
-                        #     continue
-                        
-                        argResult.argValues[argValue.name] = castValue
+                    foundNamedArg = foundNamedArgs[0]
+                    value = namedArgsDict[foundNamedArg]
+                    # validate using argValue.validators
                     
-                    # deal with positional
-                    # positionalArgs = [e for e in args if(self.namedArgDelim not in e)]
-                    # can fold into argValues loop?
+                    # try cast value to argValue.type T
+                    castValue = value
+                    # if(cast_failed):
+                    #     argResult.unhandledInputs.append(foundNamedArg)
+                    #     continue
                     
-                    argResult.argValues = resolvedArgValues
-                    argResult.unhandledInputs = unhandledInputs
-                    result.append(argResult)
+                    argResult.argValues[argValue.name] = castValue
+                
+                # deal with positional
+                # positionalArgs = [e for e in args if(self.namedArgDelim not in e)]
+                # can fold into argValues loop?
+                
+                argResult.argValues = resolvedArgValues
+                argResult.unhandledInputs = unhandledInputs
+                argResult.nextInput = potentialArgs[nextCommandIndex:]
+                result.append(argResult)
         
         return result
