@@ -19,7 +19,24 @@ class Argumentor():
         self.namedArgDelim = namedArgDelim
         self.inputDelim = inputDelim
     
-        
+    def getLastArgIndex(self, potentialArgs: list[str]) -> int:
+        commandRegex = fr"^{self.commandPrefix}.*"
+        for potentialArg in potentialArgs:
+            if(re.search(commandRegex, potentialArg)):
+                return (potentialArgs.index(potentialArg))
+            
+        # None found, default to end of list
+        return len(potentialArgs)
+    
+    def getNamedArgsDict(self, args: list[str]) -> dict[str, str]:
+        namedArgs = [e for e in args if(self.namedArgDelim in e)]
+        namedArgsDict = {}
+        for value in namedArgs:
+            key, value = value.split(self.namedArgDelim)
+            namedArgsDict[key] = value
+            
+        return namedArgsDict
+    
     def validate(self, input: str) -> list[ArgResult]:
         return self.validate(input.split(self.inputDelim))
         
@@ -31,9 +48,6 @@ class Argumentor():
         if(len(input) == 0):
             return []
         
-        # TODO reduce foreaches
-        
-        commandRegex = fr"^{self.commandPrefix}.*"
         result = []
         for command in self.commands:
             prefixedAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
@@ -44,22 +58,11 @@ class Argumentor():
                 commandIndex = input.index(alias)
                 potentialArgs = input[commandIndex + 1:]
                 
-                # TODO Method
-                argsEndIndex = len(potentialArgs)
-                for potentialArg in potentialArgs:
-                    if(re.search(commandRegex, potentialArg)):
-                        print("re found")
-                        argsEndIndex = (potentialArgs.index(potentialArg))
-                    
                 argResult = ArgResult(command.name, command.hitValue, commandIndex)
                 
-                # TODO Method
+                argsEndIndex = self.getLastArgIndex(potentialArgs)
                 args = potentialArgs[:argsEndIndex]
-                namedArgs = [e for e in args if(self.namedArgDelim in e)]
-                namedArgsDict = {}
-                for value in namedArgs:
-                    key, value = value.split(self.namedArgDelim)
-                    namedArgsDict[key] = value
+                namedArgsDict = self.getNamedArgsDict(args)
                 
                 print("debug")
                 print(f"expected last arg: {args[argsEndIndex-1]}")
@@ -68,7 +71,6 @@ class Argumentor():
                 print(f"input: {input}")
                 print(commandIndex)
                 print(potentialArgs)
-                print(namedArgs)
                 print(namedArgsDict)
                 print("debug")
                 resolvedArgValues = {}
