@@ -1,6 +1,8 @@
 from .ArgResult import ArgResult
 from .Command import Command
 
+import re
+
 class Argumentor():
     """
     Holder of all commands and args
@@ -31,7 +33,7 @@ class Argumentor():
         
         # TODO reduce foreaches
         
-        commandRegex = fr"{self.commandPrefix}.*"
+        commandRegex = fr"^{self.commandPrefix}.*"
         result = []
         for command in self.commands:
             prefixedAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
@@ -41,13 +43,18 @@ class Argumentor():
                 
                 commandIndex = input.index(alias)
                 potentialArgs = input[commandIndex + 1:]
-                nextCommandIndex = 0
-                if(commandRegex in input):
-                    nextCommandIndex = potentialArgs.index(commandRegex)
+                
+                # TODO Method
+                argsEndIndex = len(potentialArgs)
+                for potentialArg in potentialArgs:
+                    if(re.search(commandRegex, potentialArg)):
+                        print("re found")
+                        argsEndIndex = (potentialArgs.index(potentialArg))
                     
                 argResult = ArgResult(command.name, command.hitValue, commandIndex)
                 
-                args = potentialArgs[:nextCommandIndex - 1]
+                # TODO Method
+                args = potentialArgs[:argsEndIndex]
                 namedArgs = [e for e in args if(self.namedArgDelim in e)]
                 namedArgsDict = {}
                 for value in namedArgs:
@@ -55,11 +62,12 @@ class Argumentor():
                     namedArgsDict[key] = value
                 
                 print("debug")
-                print(input)
+                print(f"expected last arg: {args[argsEndIndex-1]}")
+                print(f"argsEndIndex: {argsEndIndex}")
+                print(f"args: {args}")
+                print(f"input: {input}")
                 print(commandIndex)
                 print(potentialArgs)
-                print(nextCommandIndex)
-                print(args)
                 print(namedArgs)
                 print(namedArgsDict)
                 print("debug")
@@ -88,7 +96,7 @@ class Argumentor():
                 
                 argResult.argValues = resolvedArgValues
                 argResult.unhandledInputs = unhandledInputs
-                argResult.nextInput = potentialArgs[nextCommandIndex:]
+                argResult.nextInput = potentialArgs[argsEndIndex:]
                 result.append(argResult)
         
         return result
