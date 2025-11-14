@@ -32,53 +32,48 @@ class Argumentor():
         
         result = []
         for command in self.commands:
-            prefixedAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
-            for alias in prefixedAlias:
+            prefixedCommandAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
+            for alias in prefixedCommandAlias:
                 if(alias not in input):
                     continue
                 
                 commandIndex = input.index(alias)
                 potentialArgs = input[commandIndex + 1:]
                 
-                argsEndIndex = self.getLastArgIndex(potentialArgs)
+                argsEndIndex = self.__getLastArgIndex(potentialArgs)
                 args = potentialArgs[:argsEndIndex]
-                namedArgsDict = self.getNamedArgsDict(args)
+                namedArgsDict = self.__getNamedArgsDict(args)
+                unhandledInputs = []
+                
+                # for each in namedArgsDict, replace key with name of whatever argValue key is alias for
+                unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(namedArgsDict.keys()))]
+                for i in range(len(unnamedArgs)):
+                    unnamedArg = unnamedArgs[i]
+                    positionalArg = command.argValues[i]
+                    if(positionalArg.name in namedArgsDict.keys()):
+                        unhandledInputs.append(unnamedArg)
+                        continue
+                    
+                    namedArgsDict[positionalArg.name] = unnamedArg
+                    
+                # for each key in dict, validate, try cast to type T, if not then discard, return results
+                
+                argResult = ArgResult(command.name, command.hitValue, commandIndex, namedArgsDict, unhandledInputs, potentialArgs[argsEndIndex:])
+                result.append(argResult)
                 
                 print("debug")
                 print(f"expected last arg: {args[argsEndIndex-1]}")
                 print(f"argsEndIndex: {argsEndIndex}")
                 print(f"args: {args}")
                 print(f"input: {input}")
+                print(f"unnamedArgs: {unnamedArgs}")
+                print(f"namedArgsDict: {namedArgsDict}")
+                print(f"unhandledInputs: {unhandledInputs}")
                 print("debug")
-                resolvedArgValues = {}
-                unhandledInputs = []
-                for argValue in command.argValues:
-                    foundNamedArgs = list(set(argValue.alias) & set([namedArgsDict.keys]))
-                    if(not foundNamedArgs):
-                        continue
-                    
-                    foundNamedArg = foundNamedArgs[0]
-                    value = namedArgsDict[foundNamedArg]
-                    # validate using argValue.validators
-                    
-                    # try cast value to argValue.type T
-                    castValue = value
-                    # if(cast_failed):
-                    #     argResult.unhandledInputs.append(foundNamedArg)
-                    #     continue
-                    
-                    argResult.argValues[argValue.name] = castValue
-                
-                # deal with positional
-                # positionalArgs = [e for e in args if(self.namedArgDelim not in e)]
-                # can fold into argValues loop?
-                
-                argResult = ArgResult(command.name, command.hitValue, commandIndex, resolvedArgValues, unhandledInputs, potentialArgs[argsEndIndex:])
-                result.append(argResult)
         
         return result
     
-    def getLastArgIndex(self, potentialArgs: list[str]) -> int:
+    def __getLastArgIndex(self, potentialArgs: list[str]) -> int:
         commandRegex = fr"^{self.commandPrefix}.*"
         for potentialArg in potentialArgs:
             if(re.search(commandRegex, potentialArg)):
@@ -87,7 +82,7 @@ class Argumentor():
         # None found, default to end of list
         return len(potentialArgs)
     
-    def getNamedArgsDict(self, args: list[str]) -> dict[str, str]:
+    def __getNamedArgsDict(self, args: list[str]) -> dict[str, str]:
         namedArgs = [e for e in args if(self.namedArgDelim in e)]
         namedArgsDict = {}
         for value in namedArgs:
