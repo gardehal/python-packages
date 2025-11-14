@@ -8,12 +8,12 @@ class ArgResult():
     commandIndex: int
     argValues: dict[str, object]
     unhandledInputs: list[str]
-    nextInput: str
+    nextInputs: list[str]
 
-    def __init__(self, commandName: str, hitValue: object, commandIndex: int):
+    def __init__(self, commandName: str, hitValue: object, commandIndex: int, argValues: dict[str, object], unhandledInputs: list[str], nextInputs: list[str]):
         self.commandName = commandName
         self.hitValue = hitValue
         self.commandIndex = commandIndex
-        self.argValues = {}
-        self.unhandledInputs = []
-        self.nextInput = []
+        self.argValues = argValues
+        self.unhandledInputs = unhandledInputs
+        self.nextInputs = nextInputs
