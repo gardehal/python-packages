@@ -46,16 +46,7 @@ class Argumentor():
                 aliasArgsDict = self.__getAliasArgsDict(args)
                 argValues, unhandledInputs = self.__validateArgs(command.argValues, aliasArgsDict)
                 
-                argValues = {} 
-                unhandledInputs = []
-                # TODO
-                # for each in namedArgsDict, replace key with name of whatever argValue key is alias for
-                # Dont like creating another dict here..
-                # argValues = {}
-                # for key in namedArgsDict.keys():
-                #     if(key in alias of argsValue.alias):
-                #         argValues[argsValue.name] = namedArgsDict[key]
-                
+                unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgsDict.keys()))]
                 for i in range(len(unnamedArgs)):
                     unnamedArg = unnamedArgs[i]
                     positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
@@ -102,3 +93,27 @@ class Argumentor():
             
         return aliasArgsDict
     
+    def __validateArgs(self, argValues: list[ArgValue], aliasArgsDict: dict[str, str]) -> tuple[list[str], list[str]]:
+        argValueAliasMap = {}
+        for argValue in argValues:
+            argValueAliasMap[argValue.name] = argValue.name
+            for alias in argValue.alias:
+                argValueAliasMap[alias] = argValue.name
+            
+        argValues = {}
+        unhandledInputs = []
+        for key in aliasArgsDict.keys():
+            if(key not in argValueAliasMap.keys()):
+                unhandledInputs.append(self.__formatArgErrorMessage(key, "Not a valid argument alias"))
+                continue
+            
+            if(key in argValues.keys()):
+                unhandledInputs.append(self.__formatArgErrorMessage(key, "Argument with this alias was already added"))
+                continue
+            
+            argValues[argValueAliasMap[key]] = aliasArgsDict[key]
+            
+        return argValues, unhandledInputs
+    
+    def __formatArgErrorMessage(self, arg: str, error: str) -> str:
+        return f"Argument \"{arg}\" not parsed: {error}"
