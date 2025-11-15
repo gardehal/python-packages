@@ -45,7 +45,14 @@ class Argumentor():
                 namedArgsDict = self.__getNamedArgsDict(args)
                 unhandledInputs = []
                 
+                # TODO
                 # for each in namedArgsDict, replace key with name of whatever argValue key is alias for
+                # Dont like creating another dict here..
+                # argValues = {}
+                # for key in namedArgsDict.keys():
+                #     if(key in alias of argsValue.alias):
+                #         argValues[argsValue.name] = namedArgsDict[key]
+                
                 unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(namedArgsDict.keys()))]
                 for i in range(len(unnamedArgs)):
                     unnamedArg = unnamedArgs[i]
@@ -56,11 +63,13 @@ class Argumentor():
                     
                     namedArgsDict[positionalArg.name] = unnamedArg
                     
+                # TODO
                 # for each key in dict, validate, try cast to type T, if not then discard, return results
                 
                 argResult = ArgResult(command.name, command.hitValue, commandIndex, namedArgsDict, unhandledInputs, potentialArgs[argsEndIndex:])
                 result.append(argResult)
                 
+                # TODO remove
                 print("debug")
                 print(f"expected last arg: {args[argsEndIndex-1]}")
                 print(f"argsEndIndex: {argsEndIndex}")
