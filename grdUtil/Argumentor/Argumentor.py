@@ -1,3 +1,4 @@
+from .ArgValue import ArgValue
 from .ArgResult import ArgResult
 from .Command import Command
 
@@ -33,18 +34,20 @@ class Argumentor():
         result = []
         for command in self.commands:
             prefixedCommandAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
-            for alias in prefixedCommandAlias:
-                if(alias not in input):
+            for commandAlias in prefixedCommandAlias:
+                if(commandAlias not in input):
                     continue
                 
-                commandIndex = input.index(alias)
+                commandIndex = input.index(commandAlias)
                 potentialArgs = input[commandIndex + 1:]
                 
                 argsEndIndex = self.__getLastArgIndex(potentialArgs)
                 args = potentialArgs[:argsEndIndex]
-                namedArgsDict = self.__getNamedArgsDict(args)
-                unhandledInputs = []
+                aliasArgsDict = self.__getAliasArgsDict(args)
+                argValues, unhandledInputs = self.__validateArgs(command.argValues, aliasArgsDict)
                 
+                argValues = {} 
+                unhandledInputs = []
                 # TODO
                 # for each in namedArgsDict, replace key with name of whatever argValue key is alias for
                 # Dont like creating another dict here..
@@ -53,20 +56,19 @@ class Argumentor():
                 #     if(key in alias of argsValue.alias):
                 #         argValues[argsValue.name] = namedArgsDict[key]
                 
-                unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(namedArgsDict.keys()))]
                 for i in range(len(unnamedArgs)):
                     unnamedArg = unnamedArgs[i]
-                    positionalArg = command.argValues[i]
-                    if(positionalArg.name in namedArgsDict.keys()):
-                        unhandledInputs.append(unnamedArg)
+                    positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
+                    if(positionalArg.name in aliasArgsDict.keys()):
+                        unhandledInputs.append(unnamedArg) # Arg already read as a named arg
                         continue
                     
-                    namedArgsDict[positionalArg.name] = unnamedArg
+                    argValues[positionalArg.name] = unnamedArg
                     
                 # TODO
-                # for each key in dict, validate, try cast to type T, if not then discard, return results
+                # for each key in argValues dict, validate using input validators, try cast to type T, if not then discard, return results
                 
-                argResult = ArgResult(command.name, command.hitValue, commandIndex, namedArgsDict, unhandledInputs, potentialArgs[argsEndIndex:])
+                argResult = ArgResult(command.name, command.hitValue, commandIndex, argValues, unhandledInputs, potentialArgs[argsEndIndex:])
                 result.append(argResult)
                 
                 # TODO remove
@@ -76,7 +78,7 @@ class Argumentor():
                 print(f"args: {args}")
                 print(f"input: {input}")
                 print(f"unnamedArgs: {unnamedArgs}")
-                print(f"namedArgsDict: {namedArgsDict}")
+                print(f"argValues: {argValues}")
                 print(f"unhandledInputs: {unhandledInputs}")
                 print("debug")
         
@@ -91,11 +93,12 @@ class Argumentor():
         # None found, default to end of list
         return len(potentialArgs)
     
-    def __getNamedArgsDict(self, args: list[str]) -> dict[str, str]:
-        namedArgs = [e for e in args if(self.namedArgDelim in e)]
-        namedArgsDict = {}
-        for value in namedArgs:
+    def __getAliasArgsDict(self, args: list[str]) -> dict[str, str]:
+        aliasArgs = [e for e in args if(self.namedArgDelim in e)]
+        aliasArgsDict = {}
+        for value in aliasArgs:
             key, value = value.split(self.namedArgDelim)
-            namedArgsDict[key] = value
+            aliasArgsDict[key] = value
             
-        return namedArgsDict
+        return aliasArgsDict
+    
