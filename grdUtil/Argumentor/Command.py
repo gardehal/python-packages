@@ -17,5 +17,5 @@ class Command():
         self.order = order
         self.alias = alias
         self.hitValue = hitValue
-        self.argValues = argValues
+        self.argValues = argValues.sort(key=lambda e: e.order)
         
