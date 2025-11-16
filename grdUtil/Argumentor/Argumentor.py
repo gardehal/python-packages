@@ -46,10 +46,9 @@ class Argumentor():
                 aliasArgs = self.__getAliasArgs(args)
                 argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
                 self.__addPositionalArgs(args, argValues, errorMessages, command, aliasArgs)
+                self.__validateArgs(argValues, errorMessages)
                     
-                # TODO
-                # for each key in argValues dict, validate using input validators and nullable, try cast to type T, if not then discard, return results
-                
+                # Easier to add argResult to various arguments or make some of these get/parse methods in ArgResult?
                 argResult = ArgResult(command.name, command.hitValue, commandIndex, argValues, errorMessages, potentialArgs[argsEndIndex:])
                 result.append(argResult)
         
@@ -107,6 +106,12 @@ class Argumentor():
             argValues[positionalArg.name] = unnamedArg
                     
             # TODO if length of positional args exceed expected argValues, add remaining as unhandled
+        return argValues, errorMessages
+    
+    def __validateArgs(self, args: list[str], argValues: list[str], errorMessages: list[str]) -> None:
+        # TODO
+        # for each key in argValues dict, validate using input validators and nullable, try cast to type T, if not then discard, return results
+        return
     
     def __formatArgErrorMessage(self, arg: str, error: str) -> str:
         return f"Argument \"{arg}\" not parsed: {error}"
