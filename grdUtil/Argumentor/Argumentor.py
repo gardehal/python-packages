@@ -43,14 +43,15 @@ class Argumentor():
                 
                 argsEndIndex = self.__getLastArgIndex(potentialArgs)
                 args = potentialArgs[:argsEndIndex]
-                aliasArgsDict = self.__getAliasArgsDict(args)
-                argValues, errorMessages = self.__validateArgs(command.argValues, aliasArgsDict)
+                aliasArgs = self.__getAliasArgs(args)
+                argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
+                # argValues = self.__addPositionalArgs(command.argValues, aliasArgs)
                 
-                unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgsDict.keys()))]
+                unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgs.keys()))]
                 for i in range(len(unnamedArgs)):
                     unnamedArg = unnamedArgs[i]
                     positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
-                    if(positionalArg.name in aliasArgsDict.keys()):
+                    if(positionalArg.name in aliasArgs.keys()):
                         errorMessages.append(self.__formatArgErrorMessage(unnamedArg, f"Argument was already added as named argument {positionalArg.name}"))
                         continue
                     
@@ -65,15 +66,15 @@ class Argumentor():
                 result.append(argResult)
                 
                 # TODO remove
-                print("debug")
-                print(f"expected last arg: {args[argsEndIndex-1]}")
-                print(f"argsEndIndex: {argsEndIndex}")
-                print(f"args: {args}")
-                print(f"input: {input}")
+                # print("debug")
+                # print(f"expected last arg: {args[argsEndIndex-1]}")
+                # print(f"argsEndIndex: {argsEndIndex}")
+                # print(f"args: {args}")
+                # print(f"input: {input}")
+                # print(f"argValues: {argValues}")
+                # print(f"errorMessages: {errorMessages}")
                 print(f"unnamedArgs: {unnamedArgs}")
-                print(f"argValues: {argValues}")
-                print(f"errorMessages: {errorMessages}")
-                print("debug")
+                # print("debug")
         
         return result
     
@@ -86,16 +87,16 @@ class Argumentor():
         # None found, default to end of list
         return len(potentialArgs)
     
-    def __getAliasArgsDict(self, args: list[str]) -> dict[str, str]:
-        aliasArgs = [e for e in args if(self.namedArgDelim in e)]
-        aliasArgsDict = {}
-        for value in aliasArgs:
+    def __getAliasArgs(self, args: list[str]) -> dict[str, str]:
+        inputAliasArgs = [e for e in args if(self.namedArgDelim in e)]
+        aliasArgs = {}
+        for value in inputAliasArgs:
             key, value = value.split(self.namedArgDelim)
-            aliasArgsDict[key] = value
+            aliasArgs[key] = value
             
-        return aliasArgsDict
+        return aliasArgs
     
-    def __validateArgs(self, argValues: list[ArgValue], aliasArgsDict: dict[str, str]) -> tuple[list[str], list[str]]:
+    def __getNamedArgs(self, argValues: list[ArgValue], aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
         argValueAliasMap = {}
         for argValue in argValues:
             argValueAliasMap[argValue.name] = argValue.name
@@ -104,7 +105,7 @@ class Argumentor():
             
         argValues = {}
         unhandledInputs = []
-        for key in aliasArgsDict.keys():
+        for key in aliasArgs.keys():
             if(key not in argValueAliasMap.keys()):
                 unhandledInputs.append(self.__formatArgErrorMessage(key, "Not a valid argument alias"))
                 continue
@@ -113,7 +114,7 @@ class Argumentor():
                 unhandledInputs.append(self.__formatArgErrorMessage(key, "Argument with this alias was already added"))
                 continue
             
-            argValues[argValueAliasMap[key]] = aliasArgsDict[key]
+            argValues[argValueAliasMap[key]] = aliasArgs[key]
             
         return argValues, unhandledInputs
     
