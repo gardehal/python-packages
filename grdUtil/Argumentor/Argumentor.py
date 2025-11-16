@@ -44,22 +44,24 @@ class Argumentor():
                 argsEndIndex = self.__getLastArgIndex(potentialArgs)
                 args = potentialArgs[:argsEndIndex]
                 aliasArgsDict = self.__getAliasArgsDict(args)
-                argValues, unhandledInputs = self.__validateArgs(command.argValues, aliasArgsDict)
+                argValues, errorMessages = self.__validateArgs(command.argValues, aliasArgsDict)
                 
                 unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgsDict.keys()))]
                 for i in range(len(unnamedArgs)):
                     unnamedArg = unnamedArgs[i]
                     positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
                     if(positionalArg.name in aliasArgsDict.keys()):
-                        unhandledInputs.append(unnamedArg) # Arg already read as a named arg
+                        errorMessages.append(self.__formatArgErrorMessage(unnamedArg, f"Argument was already added as named argument {positionalArg.name}"))
                         continue
                     
                     argValues[positionalArg.name] = unnamedArg
                     
+                # TODO if length of positional args exceed expected argValues, add remaining as unhandled
+                    
                 # TODO
                 # for each key in argValues dict, validate using input validators, try cast to type T, if not then discard, return results
                 
-                argResult = ArgResult(command.name, command.hitValue, commandIndex, argValues, unhandledInputs, potentialArgs[argsEndIndex:])
+                argResult = ArgResult(command.name, command.hitValue, commandIndex, argValues, errorMessages, potentialArgs[argsEndIndex:])
                 result.append(argResult)
                 
                 # TODO remove
@@ -70,7 +72,7 @@ class Argumentor():
                 print(f"input: {input}")
                 print(f"unnamedArgs: {unnamedArgs}")
                 print(f"argValues: {argValues}")
-                print(f"unhandledInputs: {unhandledInputs}")
+                print(f"errorMessages: {errorMessages}")
                 print("debug")
         
         return result
