@@ -45,36 +45,13 @@ class Argumentor():
                 args = potentialArgs[:argsEndIndex]
                 aliasArgs = self.__getAliasArgs(args)
                 argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
-                # argValues = self.__addPositionalArgs(command.argValues, aliasArgs)
-                
-                unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgs.keys()))]
-                for i in range(len(unnamedArgs)):
-                    unnamedArg = unnamedArgs[i]
-                    positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
-                    if(positionalArg.name in aliasArgs.keys()):
-                        errorMessages.append(self.__formatArgErrorMessage(unnamedArg, f"Argument was already added as named argument {positionalArg.name}"))
-                        continue
-                    
-                    argValues[positionalArg.name] = unnamedArg
-                    
-                # TODO if length of positional args exceed expected argValues, add remaining as unhandled
+                self.__addPositionalArgs(args, argValues, errorMessages, command, aliasArgs)
                     
                 # TODO
-                # for each key in argValues dict, validate using input validators, try cast to type T, if not then discard, return results
+                # for each key in argValues dict, validate using input validators and nullable, try cast to type T, if not then discard, return results
                 
                 argResult = ArgResult(command.name, command.hitValue, commandIndex, argValues, errorMessages, potentialArgs[argsEndIndex:])
                 result.append(argResult)
-                
-                # TODO remove
-                # print("debug")
-                # print(f"expected last arg: {args[argsEndIndex-1]}")
-                # print(f"argsEndIndex: {argsEndIndex}")
-                # print(f"args: {args}")
-                # print(f"input: {input}")
-                # print(f"argValues: {argValues}")
-                # print(f"errorMessages: {errorMessages}")
-                print(f"unnamedArgs: {unnamedArgs}")
-                # print("debug")
         
         return result
     
@@ -117,6 +94,19 @@ class Argumentor():
             argValues[argValueAliasMap[key]] = aliasArgs[key]
             
         return argValues, unhandledInputs
+    
+    def __addPositionalArgs(self, args: list[str], argValues: list[str], errorMessages: list[str], command: Command, aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
+        unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgs.keys()))]
+        for i in range(len(unnamedArgs)):
+            unnamedArg = unnamedArgs[i]
+            positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
+            if(positionalArg.name in aliasArgs.keys()):
+                errorMessages.append(self.__formatArgErrorMessage(unnamedArg, f"Argument was already added as named argument {positionalArg.name}"))
+                continue
+            
+            argValues[positionalArg.name] = unnamedArg
+                    
+            # TODO if length of positional args exceed expected argValues, add remaining as unhandled
     
     def __formatArgErrorMessage(self, arg: str, error: str) -> str:
         return f"Argument \"{arg}\" not parsed: {error}"
