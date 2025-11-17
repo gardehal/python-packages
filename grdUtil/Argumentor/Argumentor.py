@@ -96,7 +96,15 @@ class Argumentor():
     
     def __addPositionalArgs(self, args: list[str], argValues: dict[str, str], errorMessages: list[str], command: Command, aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
         unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgs.keys()))]
+        
         for i in range(len(unnamedArgs)):
+            if(i >= len(command.argValues)):
+                errorMessages.append(f"Received more arguments ({len(unnamedArgs)}) than expected ({len(command.argValues)})")
+                for extraArg in unnamedArgs[i:]:
+                    errorMessages.append(self.__formatArgErrorMessage(extraArg, f"Skipped, exceeds ArgValues length"))
+                    
+                break
+            
             unnamedArg = unnamedArgs[i]
             positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
             if(positionalArg.name in aliasArgs.keys()):
@@ -115,19 +123,19 @@ class Argumentor():
             if(argValue is None 
                or (not argValue.nullable and argValues[key] is None)):
                 # argValues[key] = None # Remove argument?
-                errorMessages.append(self.__formatArgErrorMessage(key, "Argument value was None, but ArgValue is not nullable"))
+                errorMessages.append(self.__formatArgErrorMessage(key, "Critical error! Argument value was None, but ArgValue is not nullable"))
                 return False
         
             # TODO Validate using validators
             if(False):
                 # argValues[key] = None # Remove argument?
-                errorMessages.append(self.__formatArgErrorMessage(key, "Argument did not pass validation"))
+                errorMessages.append(self.__formatArgErrorMessage(key, "Critical error! Argument did not pass validation"))
                 return False
                 
             # TODO Cast to desired type
             if(False):
                 # argValues[key] = None # Remove argument?
-                errorMessages.append(self.__formatArgErrorMessage(key, f"Argument could not be cast to type {key}"))
+                errorMessages.append(self.__formatArgErrorMessage(key, f"Critical error! Argument could not be cast to type {key}"))
                 return False
         
         return True
