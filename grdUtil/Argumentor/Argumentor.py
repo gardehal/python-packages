@@ -46,7 +46,6 @@ class Argumentor():
                 aliasArgs = self.__getAliasArgs(args)
                 argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
                 self.__addPositionalArgs(args, argValues, errorMessages, command, aliasArgs)
-                self.__validateArgs(argValues, errorMessages)
                     
                 # Easier to add argResult to various arguments or make some of these get/parse methods in ArgResult?
                 argResult = ArgResult(command.name, command.hitValue, commandIndex, argValues, errorMessages, potentialArgs[argsEndIndex:])
@@ -94,7 +93,7 @@ class Argumentor():
             
         return argValues, unhandledInputs
     
-    def __addPositionalArgs(self, args: list[str], argValues: list[str], errorMessages: list[str], command: Command, aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
+    def __addPositionalArgs(self, args: list[str], argValues: dict[str, str], errorMessages: list[str], command: Command, aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
         unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgs.keys()))]
         for i in range(len(unnamedArgs)):
             unnamedArg = unnamedArgs[i]
@@ -108,10 +107,30 @@ class Argumentor():
             # TODO if length of positional args exceed expected argValues, add remaining as unhandled
         return argValues, errorMessages
     
-    def __validateArgs(self, args: list[str], argValues: list[str], errorMessages: list[str]) -> None:
-        # TODO
-        # for each key in argValues dict, validate using input validators and nullable, try cast to type T, if not then discard, return results
-        return
+    def __argsAreValid(self, command: Command, argValues: dict[str, str], errorMessages: list[str]) -> bool:
+        for key in argValues.keys():
+            argValue = [e for e in command.argValues if e.name is key ][0]
+            
+            if(argValue is None 
+               or (not argValue.nullable and argValues[key] is None)):
+                # argValues[key] = None # Remove argument?
+                errorMessages.append(self.__formatArgErrorMessage(key, "Argument value was None, but ArgValue is not nullable"))
+                return False
+        
+            # TODO Validate using validators
+            if(False):
+                # argValues[key] = None # Remove argument?
+                errorMessages.append(self.__formatArgErrorMessage(key, "Argument did not pass validation"))
+                return False
+                
+            # TODO Cast to desired type
+            if(False):
+                # argValues[key] = None # Remove argument?
+                errorMessages.append(self.__formatArgErrorMessage(key, f"Argument could not be cast to type {key}"))
+                return False
+        
+        return True
     
     def __formatArgErrorMessage(self, arg: str, error: str) -> str:
         return f"Argument \"{arg}\" not parsed: {error}"
+    
