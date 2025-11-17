@@ -46,9 +46,10 @@ class Argumentor():
                 aliasArgs = self.__getAliasArgs(args)
                 argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
                 self.__addPositionalArgs(args, argValues, errorMessages, command, aliasArgs)
+                isValid = self.__argsAreValid(command, argValues, errorMessages)
                     
                 # Easier to add argResult to various arguments or make some of these get/parse methods in ArgResult?
-                argResult = ArgResult(command.name, command.hitValue, commandIndex, argValues, errorMessages, potentialArgs[argsEndIndex:])
+                argResult = ArgResult(isValid, command.name, command.hitValue, commandIndex, argValues, errorMessages, potentialArgs[argsEndIndex:])
                 result.append(argResult)
         
         return result
