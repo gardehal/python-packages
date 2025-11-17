@@ -106,14 +106,13 @@ class Argumentor():
                 break
             
             unnamedArg = unnamedArgs[i]
-            positionalArg = command.argValues[i] # Check i doesnt go outside bounds?
+            positionalArg = command.argValues[i]
             if(positionalArg.name in aliasArgs.keys()):
                 errorMessages.append(self.__formatArgErrorMessage(unnamedArg, f"Argument was already added as named argument {positionalArg.name}"))
                 continue
             
             argValues[positionalArg.name] = unnamedArg
                     
-            # TODO if length of positional args exceed expected argValues, add remaining as unhandled
         return argValues, errorMessages
     
     def __argsAreValid(self, command: Command, argValues: dict[str, str], errorMessages: list[str]) -> bool:
