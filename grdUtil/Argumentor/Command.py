@@ -20,4 +20,5 @@ class Command():
         self.argValues = argValues 
         
         self.argValues.sort(key=lambda x: x.order)
+        # TODO check duplicates by name
         
