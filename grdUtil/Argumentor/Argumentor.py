@@ -3,6 +3,7 @@ from .ArgResult import ArgResult
 from .Command import Command
 
 import re
+from typing import cast
 
 class Argumentor():
     """
@@ -32,8 +33,10 @@ class Argumentor():
             return []
         
         result = []
+        nextInputs = []
         for command in self.commands:
             prefixedCommandAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
+            # TODO reverse? as in get inputs with prefix, remove it, and match on alias, then find index again?
             for commandAlias in prefixedCommandAlias:
                 if(commandAlias not in input):
                     continue
@@ -42,16 +45,21 @@ class Argumentor():
                 potentialArgs = input[commandIndex + 1:]
                 
                 argsEndIndex = self.__getLastArgIndex(potentialArgs)
+                nextInputs = potentialArgs[argsEndIndex:]
                 args = potentialArgs[:argsEndIndex]
                 aliasArgs = self.__getAliasArgs(args)
                 argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
                 self.__addPositionalArgs(args, argValues, errorMessages, command, aliasArgs)
                 isValid = self.__argsAreValid(command, argValues, errorMessages)
                     
-                # Easier to add argResult to various arguments or make some of these get/parse methods in ArgResult?
-                argResult = ArgResult(isValid, command.name, command.hitValue, commandIndex, argValues, errorMessages, potentialArgs[argsEndIndex:])
+                # TODO Easier to add argResult to various arguments or make some of these get/parse methods in ArgResult?
+                argResult = ArgResult(isValid, command.name, command.hitValue, commandIndex, argValues, errorMessages, nextInputs)
                 result.append(argResult)
         
+        # TODO need a reset function, if a command is found, add result, then go back and parse from last found
+        # if(len(result) > 0):
+        #     result.append(self.validate(nextInputs))
+    
         return result
     
     def __getLastArgIndex(self, potentialArgs: list[str]) -> int:
@@ -112,32 +120,41 @@ class Argumentor():
                 continue
             
             argValues[positionalArg.name] = unnamedArg
-                    
+            
         return argValues, errorMessages
     
     def __argsAreValid(self, command: Command, argValues: dict[str, str], errorMessages: list[str]) -> bool:
+        
+        castDict: dict[str, object] = {}
         for key in argValues.keys():
             argValue = [e for e in command.argValues if e.name is key ][0]
+            if(argValue is None):
+                errorMessages.append(self.__formatArgErrorMessage(value, "No ArgValue found"))
+                continue
             
-            if(argValue is None 
-               or (not argValue.nullable and argValues[key] is None)):
-                # argValues[key] = None # Remove argument?
-                errorMessages.append(self.__formatArgErrorMessage(key, "Critical error! Argument value was None, but ArgValue is not nullable"))
+            value = argValues[key]
+            if(value is None and not argValue.nullable):
+                errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument value was None, and ArgValue is not nullable"))
+                return False
+            
+            castValue = None
+            try:
+                castValue = (argValue.typeT)(value)
+            except:
+                # TODO should include what argValue.name/key its trying to cast
+                # TODO add default here if any, otherwise return false
+                errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} could not be cast to {argValue.typeT}")) 
                 return False
         
             # TODO Validate using validators
             if(False):
-                # argValues[key] = None # Remove argument?
-                errorMessages.append(self.__formatArgErrorMessage(key, "Critical error! Argument did not pass validation"))
-                return False
-                
-            # TODO Cast to desired type
-            if(False):
-                # argValues[key] = None # Remove argument?
-                errorMessages.append(self.__formatArgErrorMessage(key, f"Critical error! Argument could not be cast to type {key}"))
+                errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument did not pass validation"))
                 return False
         
-        return True
+            print(f"{castValue} expected {argValue.typeT}, was {type(castValue)}")
+            castDict[key] = castValue
+        
+        return True # + castDict
     
     def __formatArgErrorMessage(self, arg: str, error: str) -> str:
         return f"Argument \"{arg}\" not parsed: {error}"
