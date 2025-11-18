@@ -5,25 +5,25 @@ class ArgResult():
     """
     isValid: bool
     commandName: str
-    hitValue: object
+    commandHitValue: object
     commandIndex: int
     argValues: dict[str, object]
     errorMessages: list[str]
     nextInputs: list[str]
 
-    def __init__(self, isValid: bool, commandName: str, hitValue: object, commandIndex: int, argValues: dict[str, object], errorMessages: list[str], nextInputs: list[str]):
+    def __init__(self, isValid: bool, commandName: str, commandHitValue: object, commandIndex: int, argValues: dict[str, object], errorMessages: list[str], nextInputs: list[str]):
         self.isValid = isValid
         self.commandName = commandName
-        self.hitValue = hitValue
+        self.commandHitValue = commandHitValue
         self.commandIndex = commandIndex
         self.argValues = argValues
         self.errorMessages = errorMessages
         self.nextInputs = nextInputs
         
-    # def __init__(self, commandName: str, hitValue: object, commandIndex: int):
+    # def __init__(self, commandName: str, commandHitValue: object, commandIndex: int):
     #     self.isValid = False
     #     self.commandName = commandName
-    #     self.hitValue = hitValue
+    #     self.commandHitValue = commandHitValue
     #     self.commandIndex = commandIndex
     #     self.argValues = {}
     #     self.errorMessages = []
