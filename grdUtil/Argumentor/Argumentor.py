@@ -32,20 +32,24 @@ class Argumentor():
         if(len(input) == 0):
             return []
         
+        # TODO: check duplicate command names/alias and argvalue/alias so it cant be -dimensions w:1 w:2 (width and weight)
+        # Let user find out themselves? 
+        
         result = []
         nextInputs = []
         for command in self.commands:
             prefixedCommandAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
             # TODO reverse? as in get inputs with prefix, remove it, and match on alias, then find index again?
             for commandAlias in prefixedCommandAlias:
+                
                 if(commandAlias not in input):
                     continue
                 
                 commandIndex = input.index(commandAlias)
                 potentialArgs = input[commandIndex + 1:]
-                
                 argsEndIndex = self.__getLastArgIndex(potentialArgs)
                 nextInputs = potentialArgs[argsEndIndex:]
+                
                 args = potentialArgs[:argsEndIndex]
                 aliasArgs = self.__getAliasArgs(args)
                 argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
@@ -57,8 +61,14 @@ class Argumentor():
                 result.append(argResult)
         
         # TODO need a reset function, if a command is found, add result, then go back and parse from last found
-        # if(len(result) > 0):
-        #     result.append(self.validate(nextInputs))
+        
+        if(nextInputs):
+            print("nexting")
+            x = nextInputs
+            nexts = self.validate(x)
+            print(x)
+            print(nexts)
+            result.extend(nexts)
     
         return result
     

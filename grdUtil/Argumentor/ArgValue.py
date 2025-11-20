@@ -27,5 +27,4 @@ class ArgValue():
         self.useDefaultValue = useDefaultValue
         self.defaultValue = defaultValue
         
-        # TODO check duplicates by name
         
