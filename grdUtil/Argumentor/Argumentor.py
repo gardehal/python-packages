@@ -3,7 +3,6 @@ from .ArgResult import ArgResult
 from .Command import Command
 
 import re
-from typing import cast
 
 class Argumentor():
     """
@@ -27,6 +26,7 @@ class Argumentor():
     def validate(self, input: list[str]) -> list[ArgResult]:
         """
         Validate input and return list of ArgResults found, with arguments, if any are found.
+        Commands and related arguments not in commands list will not be parsed.
         """
         
         if(len(input) == 0):
@@ -34,18 +34,17 @@ class Argumentor():
         
         # TODO: check duplicate command names/alias and argvalue/alias so it cant be -dimensions w:1 w:2 (width and weight)
         # Let user find out themselves? 
+        # TODO reverse? as in get inputs with prefix, remove it, and match on alias, then find index again?
+        # TODO what if an input should be something like "-1", means forced named arg?
+        # TODO Main loop and handleing should be reworked, spinning up 15 vars and reassigning seems unnessecary
+        # TODO rename things, argvalue is a really bad name, command and argumentor is good, argresult is passable
         
         result = []
         nextInputs = []
         for command in self.commands:
             prefixedCommandAlias = [f"{self.commandPrefix}{e}" for e in command.alias]
-            # TODO reverse? as in get inputs with prefix, remove it, and match on alias, then find index again?
             for commandAlias in prefixedCommandAlias:
-                
                 if(commandAlias not in input):
-                    # inputIndex = input.index(??)
-                    # noCommandFoundResult = ArgResult().createInvalid(commandAlias, inputIndex, ["Command not valid"], input[inputIndex:])
-                    # result.append(noCommandFoundResult)
                     continue
                 
                 commandIndex = input.index(commandAlias)
@@ -63,7 +62,7 @@ class Argumentor():
                 if(isValid):
                     argResult = ArgResult().createValid(command.name, command.hitValue, commandIndex, argValues, errorMessages, nextInputs)
                 else:
-                    argResult = ArgResult().createInvalid(command.name, command.hitValue, commandIndex, errorMessages, nextInputs)
+                    argResult = ArgResult().createInvalid(command.name, commandIndex, errorMessages, nextInputs)
                 result.append(argResult)
         
         if(nextInputs):
@@ -144,9 +143,11 @@ class Argumentor():
             value = argValues[key]
             if(value is None and not argValue.nullable):
                 if(argValue.useDefaultValue):
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"Argument for {key} was None and not nullable, default {argValue.defaultValue} was applied"))
                     castValue = argValue.defaultValue
+                    continue
                 else:
-                    errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument value was None, and ArgValue is not nullable"))
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} was None, and ArgValue is not nullable"))
                     return False
             
             castValue = None
@@ -154,23 +155,27 @@ class Argumentor():
                 castValue = (argValue.typeT)(value)
             except:
                 if(argValue.useDefaultValue):
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"Argument for {key} could not be cast, default {argValue.defaultValue} was applied"))
                     castValue = argValue.defaultValue
+                    continue
                 else:
                     errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} could not be cast to {argValue.typeT}")) 
                     return False
         
-            # TODO Validate using validators
-            if(False):
-                if(argValue.useDefaultValue):
-                    castValue = argValue.defaultValue
-                else:
-                    errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument did not pass validation"))
-                    return False
+            if(argValue.validators):
+                resultValid = argValue.validators(castValue)
+                if(not resultValid):
+                    if(argValue.useDefaultValue):
+                        errorMessages.append(self.__formatArgErrorMessage(value, f"Argument for {key} did not pass validation, default {argValue.defaultValue} was applied"))
+                        castValue = argValue.defaultValue
+                        continue
+                    else:
+                        errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} did not pass validation"))
+                        return False
         
-            print(f"{castValue} expected {argValue.typeT}, was {type(castValue)}")
             castDict[key] = castValue
         
-        return True # + castDict
+        return True # TODO + castDict
     
     def __formatArgErrorMessage(self, arg: str, error: str) -> str:
         return f"Argument \"{arg}\" not parsed: {error}"
