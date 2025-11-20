@@ -134,22 +134,29 @@ class Argumentor():
             
             value = argValues[key]
             if(value is None and not argValue.nullable):
-                errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument value was None, and ArgValue is not nullable"))
-                return False
+                if(argValue.useDefaultValue):
+                    castValue = argValue.defaultValue
+                else:
+                    errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument value was None, and ArgValue is not nullable"))
+                    return False
             
             castValue = None
             try:
                 castValue = (argValue.typeT)(value)
             except:
-                # TODO should include what argValue.name/key its trying to cast
-                # TODO add default here if any, otherwise return false
-                errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} could not be cast to {argValue.typeT}")) 
-                return False
+                if(argValue.useDefaultValue):
+                    castValue = argValue.defaultValue
+                else:
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} could not be cast to {argValue.typeT}")) 
+                    return False
         
             # TODO Validate using validators
             if(False):
-                errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument did not pass validation"))
-                return False
+                if(argValue.useDefaultValue):
+                    castValue = argValue.defaultValue
+                else:
+                    errorMessages.append(self.__formatArgErrorMessage(value, "Critical error! Argument did not pass validation"))
+                    return False
         
             print(f"{castValue} expected {argValue.typeT}, was {type(castValue)}")
             castDict[key] = castValue

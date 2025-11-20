@@ -17,15 +17,15 @@ class ArgValue():
     useDefaultValue: bool
     defaultValue: T
     
-    def __init__(self, name: str, order: int, alias: list[str], type: Type[T], nullable: bool = False, validators: int = 0):
+    def __init__(self, name: str, order: int, alias: list[str], type: Type[T], nullable: bool = False, validators: int = 0, useDefaultValue: bool = False, defaultValue: T = None):
         self.name = name
         self.order = order
         self.alias = alias
         self.typeT = type
         self.nullable = nullable
         self.validators = validators
-        # self.useDefaultValue = useDefaultValue
-        # self.defaultValue = defaultValue
+        self.useDefaultValue = useDefaultValue
+        self.defaultValue = defaultValue
         
         # TODO check duplicates by name
         
