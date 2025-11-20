@@ -43,6 +43,9 @@ class Argumentor():
             for commandAlias in prefixedCommandAlias:
                 
                 if(commandAlias not in input):
+                    # inputIndex = input.index(??)
+                    # noCommandFoundResult = ArgResult().createInvalid(commandAlias, inputIndex, ["Command not valid"], input[inputIndex:])
+                    # result.append(noCommandFoundResult)
                     continue
                 
                 commandIndex = input.index(commandAlias)
@@ -56,19 +59,15 @@ class Argumentor():
                 self.__addPositionalArgs(args, argValues, errorMessages, command, aliasArgs)
                 isValid = self.__argsAreValid(command, argValues, errorMessages)
                     
-                # TODO Easier to add argResult to various arguments or make some of these get/parse methods in ArgResult?
-                argResult = ArgResult(isValid, command.name, command.hitValue, commandIndex, argValues, errorMessages, nextInputs)
+                argResult = None
+                if(isValid):
+                    argResult = ArgResult().createValid(command.name, command.hitValue, commandIndex, argValues, errorMessages, nextInputs)
+                else:
+                    argResult = ArgResult().createInvalid(command.name, command.hitValue, commandIndex, errorMessages, nextInputs)
                 result.append(argResult)
         
-        # TODO need a reset function, if a command is found, add result, then go back and parse from last found
-        
         if(nextInputs):
-            print("nexting")
-            x = nextInputs
-            nexts = self.validate(x)
-            print(x)
-            print(nexts)
-            result.extend(nexts)
+            result.extend(self.validate(nextInputs))
     
         return result
     
