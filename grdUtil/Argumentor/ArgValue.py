@@ -1,4 +1,4 @@
-from typing import TypeVar, Type
+from typing import TypeVar, Type, Callable
 
 T = TypeVar("T")
 
@@ -13,11 +13,11 @@ class ArgValue():
     alias: list[str]
     typeT: Type[T]
     nullable: bool
-    validators: int # func , things like min, max values, length etc.
+    validators: Callable[[T], bool]
     useDefaultValue: bool
     defaultValue: T
     
-    def __init__(self, name: str, order: int, alias: list[str], type: Type[T], nullable: bool = False, validators: int = 0, useDefaultValue: bool = False, defaultValue: T = None):
+    def __init__(self, name: str, order: int, alias: list[str], type: Type[T], nullable: bool = False, validators: Callable[[T], bool] = None, useDefaultValue: bool = False, defaultValue: T = None):
         self.name = name
         self.order = order
         self.alias = alias
@@ -26,5 +26,4 @@ class ArgValue():
         self.validators = validators
         self.useDefaultValue = useDefaultValue
         self.defaultValue = defaultValue
-        
         
