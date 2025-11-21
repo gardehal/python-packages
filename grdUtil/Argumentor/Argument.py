@@ -2,12 +2,13 @@ from typing import TypeVar, Type, Callable
 
 T = TypeVar("T")
 
-class ArgValue():
+class Argument():
     """
-    Designates values input as args to commands 
+    Designates values input as arguments after commands 
     eg. height in 
     $ -dimensions height:100
     """
+    
     name: str
     order: int
     alias: list[str]
@@ -26,4 +27,4 @@ class ArgValue():
         self.validators = validators
         self.useDefaultValue = useDefaultValue
         self.defaultValue = defaultValue
-        
+                
