@@ -1,4 +1,4 @@
-from .ArgValue import ArgValue
+from .Argument import Argument
 from .ArgResult import ArgResult
 from .Command import Command
 
@@ -32,12 +32,12 @@ class Argumentor():
         if(len(input) == 0):
             return []
         
-        # TODO: check duplicate command names/alias and argvalue/alias so it cant be -dimensions w:1 w:2 (width and weight)
+        # TODO: check duplicate command names/alias and argument/alias so it cant be -dimensions w:1 w:2 (width and weight)
         # Let user find out themselves? 
         # TODO reverse? as in get inputs with prefix, remove it, and match on alias, then find index again?
-        # TODO what if an input should be something like "-1", means forced named arg?
         # TODO Main loop and handleing should be reworked, spinning up 15 vars and reassigning seems unnessecary
-        # TODO rename things, argvalue is a really bad name, command and argumentor is good, argresult is passable
+        # TODO rename things, argument is a really bad name, command and argumentor is good, argresult is passable
+        # TODO error messages should be improved, shorter, more concise
         
         result = []
         nextInputs = []
@@ -54,13 +54,13 @@ class Argumentor():
                 
                 args = potentialArgs[:argsEndIndex]
                 aliasArgs = self.__getAliasArgs(args)
-                argValues, errorMessages = self.__getNamedArgs(command.argValues, aliasArgs)
-                self.__addPositionalArgs(args, argValues, errorMessages, command, aliasArgs)
-                isValid = self.__argsAreValid(command, argValues, errorMessages)
+                arguments, errorMessages = self.__getNamedArgs(command.arguments, aliasArgs)
+                self.__addPositionalArgs(args, arguments, errorMessages, command, aliasArgs)
+                isValid = self.__argsAreValid(command, arguments, errorMessages)
                     
                 argResult = None
                 if(isValid):
-                    argResult = ArgResult().createValid(command.name, command.hitValue, commandIndex, argValues, errorMessages, nextInputs)
+                    argResult = ArgResult().createValid(command.name, command.hitValue, commandIndex, arguments, errorMessages, nextInputs)
                 else:
                     argResult = ArgResult().createInvalid(command.name, commandIndex, errorMessages, nextInputs)
                 result.append(argResult)
@@ -88,89 +88,89 @@ class Argumentor():
             
         return aliasArgs
     
-    def __getNamedArgs(self, argValues: list[ArgValue], aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
-        argValueAliasMap = {}
-        for argValue in argValues:
-            argValueAliasMap[argValue.name] = argValue.name
-            for alias in argValue.alias:
-                argValueAliasMap[alias] = argValue.name
+    def __getNamedArgs(self, arguments: list[Argument], aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
+        argumentAliasMap = {}
+        for argument in arguments:
+            argumentAliasMap[argument.name] = argument.name
+            for alias in argument.alias:
+                argumentAliasMap[alias] = argument.name
             
-        argValues = {}
+        argumentsDict = {}
         unhandledInputs = []
         for key in aliasArgs.keys():
-            if(key not in argValueAliasMap.keys()):
+            if(key not in argumentAliasMap.keys()):
                 unhandledInputs.append(self.__formatArgErrorMessage(key, "Not a valid argument alias"))
                 continue
             
-            if(key in argValues.keys()):
-                unhandledInputs.append(self.__formatArgErrorMessage(key, "Argument with this alias was already added"))
+            if(key in argumentsDict.keys()):
+                unhandledInputs.append(self.__formatArgErrorMessage(key, "Alias was already added"))
                 continue
             
-            argValues[argValueAliasMap[key]] = aliasArgs[key]
+            argumentsDict[argumentAliasMap[key]] = aliasArgs[key]
             
-        return argValues, unhandledInputs
+        return argumentsDict, unhandledInputs
     
-    def __addPositionalArgs(self, args: list[str], argValues: dict[str, str], errorMessages: list[str], command: Command, aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
+    def __addPositionalArgs(self, args: list[str], arguments: dict[str, str], errorMessages: list[str], command: Command, aliasArgs: dict[str, str]) -> tuple[list[str], list[str]]:
         unnamedArgs = [e for e in args if(e.split(self.namedArgDelim)[0] not in list(aliasArgs.keys()))]
         
         for i in range(len(unnamedArgs)):
-            if(i >= len(command.argValues)):
-                errorMessages.append(f"Received more arguments ({len(unnamedArgs)}) than expected ({len(command.argValues)})")
+            if(i >= len(command.arguments)):
+                errorMessages.append(f"Received more arguments ({len(unnamedArgs)}) than expected ({len(command.arguments)})")
                 for extraArg in unnamedArgs[i:]:
-                    errorMessages.append(self.__formatArgErrorMessage(extraArg, f"Skipped, exceeds ArgValues length"))
+                    errorMessages.append(self.__formatArgErrorMessage(extraArg, f"Skipped, exceeds Arguments length"))
                     
                 break
             
             unnamedArg = unnamedArgs[i]
-            positionalArg = command.argValues[i]
+            positionalArg = command.arguments[i]
             if(positionalArg.name in aliasArgs.keys()):
-                errorMessages.append(self.__formatArgErrorMessage(unnamedArg, f"Argument was already added as named argument {positionalArg.name}"))
+                errorMessages.append(self.__formatArgErrorMessage(unnamedArg, f"Already added as named argument {positionalArg.name}"))
                 continue
             
-            argValues[positionalArg.name] = unnamedArg
+            arguments[positionalArg.name] = unnamedArg
             
-        return argValues, errorMessages
+        return arguments, errorMessages
     
-    def __argsAreValid(self, command: Command, argValues: dict[str, str], errorMessages: list[str]) -> bool:
+    def __argsAreValid(self, command: Command, arguments: dict[str, str], errorMessages: list[str]) -> bool:
         
         castDict: dict[str, object] = {}
-        for key in argValues.keys():
-            argValue = [e for e in command.argValues if e.name is key ][0]
-            if(argValue is None):
-                errorMessages.append(self.__formatArgErrorMessage(value, "No ArgValue found"))
+        for key in arguments.keys():
+            argument = [e for e in command.arguments if e.name is key ][0]
+            if(argument is None):
+                errorMessages.append(self.__formatArgErrorMessage(value, "No Argument found"))
                 continue
             
-            value = argValues[key]
-            if(value is None and not argValue.nullable):
-                if(argValue.useDefaultValue):
-                    errorMessages.append(self.__formatArgErrorMessage(value, f"Argument for {key} was None and not nullable, default {argValue.defaultValue} was applied"))
-                    castValue = argValue.defaultValue
+            value = arguments[key]
+            if(value is None and not argument.nullable):
+                if(argument.useDefaultValue):
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"{key} was None and not nullable, default {argument.defaultValue} was applied"))
+                    castValue = argument.defaultValue
                     continue
                 else:
-                    errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} was None, and ArgValue is not nullable"))
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! {key} was None, and Argument is not nullable"))
                     return False
             
             castValue = None
             try:
-                castValue = (argValue.typeT)(value)
+                castValue = (argument.typeT)(value)
             except:
-                if(argValue.useDefaultValue):
-                    errorMessages.append(self.__formatArgErrorMessage(value, f"Argument for {key} could not be cast, default {argValue.defaultValue} was applied"))
-                    castValue = argValue.defaultValue
+                if(argument.useDefaultValue):
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"{key} could not be cast, default {argument.defaultValue} was applied"))
+                    castValue = argument.defaultValue
                     continue
                 else:
-                    errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} could not be cast to {argValue.typeT}")) 
+                    errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! {key} could not be cast to {argument.typeT}")) 
                     return False
         
-            if(argValue.validators):
-                resultValid = argValue.validators(castValue)
+            if(argument.validators):
+                resultValid = argument.validators(castValue)
                 if(not resultValid):
-                    if(argValue.useDefaultValue):
-                        errorMessages.append(self.__formatArgErrorMessage(value, f"Argument for {key} did not pass validation, default {argValue.defaultValue} was applied"))
-                        castValue = argValue.defaultValue
+                    if(argument.useDefaultValue):
+                        errorMessages.append(self.__formatArgErrorMessage(value, f"{key} did not pass validation, default {argument.defaultValue} was applied"))
+                        castValue = argument.defaultValue
                         continue
                     else:
-                        errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! Argument for {key} did not pass validation"))
+                        errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! {key} did not pass validation"))
                         return False
         
             castDict[key] = castValue
@@ -178,5 +178,5 @@ class Argumentor():
         return True # TODO + castDict
     
     def __formatArgErrorMessage(self, arg: str, error: str) -> str:
-        return f"Argument \"{arg}\" not parsed: {error}"
+        return f"Argument \"{arg}\" error: {error}"
     
