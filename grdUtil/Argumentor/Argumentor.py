@@ -56,13 +56,10 @@ class Argumentor():
                 aliasArgs = self.__getAliasArgs(args)
                 arguments, errorMessages = self.__getNamedArgs(command.arguments, aliasArgs)
                 self.__addPositionalArgs(args, arguments, errorMessages, command, aliasArgs)
-                isValid = self.__argsAreValid(command, arguments, errorMessages)
+                castArguments = self.__argsAreValid(command, arguments, errorMessages)
                     
-                argResult = None
-                if(isValid):
-                    argResult = ArgResult().createValid(command.name, command.hitValue, commandIndex, arguments, errorMessages, nextInputs)
-                else:
-                    argResult = ArgResult().createInvalid(command.name, commandIndex, errorMessages, nextInputs)
+                isValid = castArguments != None
+                argResult = ArgResult(isValid, command.name, command.hitValue, commandIndex, castArguments, errorMessages, nextInputs)
                 result.append(argResult)
         
         if(nextInputs):
@@ -131,7 +128,7 @@ class Argumentor():
             
         return arguments, errorMessages
     
-    def __argsAreValid(self, command: Command, arguments: dict[str, str], errorMessages: list[str]) -> bool:
+    def __argsAreValid(self, command: Command, arguments: dict[str, str], errorMessages: list[str]) -> dict[str, object]:
         
         castDict: dict[str, object] = {}
         for key in arguments.keys():
@@ -148,7 +145,7 @@ class Argumentor():
                     continue
                 else:
                     errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! {key} was None, and Argument is not nullable"))
-                    return False
+                    return None
             
             castValue = None
             try:
@@ -160,7 +157,7 @@ class Argumentor():
                     continue
                 else:
                     errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! {key} could not be cast to {argument.typeT}")) 
-                    return False
+                    return None
         
             if(argument.validators):
                 resultValid = argument.validators(castValue)
@@ -171,11 +168,11 @@ class Argumentor():
                         continue
                     else:
                         errorMessages.append(self.__formatArgErrorMessage(value, f"Critical error! {key} did not pass validation"))
-                        return False
+                        return FaNonelse
         
             castDict[key] = castValue
         
-        return True # TODO + castDict
+        return castDict
     
     def __formatArgErrorMessage(self, arg: str, error: str) -> str:
         return f"Argument \"{arg}\" error: {error}"

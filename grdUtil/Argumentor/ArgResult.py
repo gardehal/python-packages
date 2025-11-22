@@ -12,27 +12,14 @@ class ArgResult():
     errorMessages: list[str]
     nextInputs: list[str]
     
-    def createValid(self, commandName: str, commandHitValue: object, commandIndex: int, argValues: dict[str, object], errorMessages: list[str], nextInputs: list[str]):
-        self.isValid = True
+    def __init__(self, isValid: bool, commandName: str, commandHitValue: object, commandIndex: int, argValues: dict[str, object], errorMessages: list[str], nextInputs: list[str]):
+        self.isValid = isValid
         self.commandName = commandName
         self.commandHitValue = commandHitValue
         self.commandIndex = commandIndex
         self.argValues = argValues
         self.errorMessages = errorMessages
         self.nextInputs = nextInputs
-        
-        return self
-    
-    def createInvalid(self, commandName: str, commandIndex: int, errorMessages: list[str], nextInputs: list[str]):
-        self.isValid = False
-        self.commandName = commandName
-        self.commandHitValue = None
-        self.commandIndex = commandIndex
-        self.argValues = None
-        self.errorMessages = errorMessages
-        self.nextInputs = nextInputs
-        
-        return self
         
     def toString(self) -> str:
         return f"""
