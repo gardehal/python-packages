@@ -32,6 +32,8 @@ class Argumentor():
         if(len(input) == 0):
             return []
         
+        # TODO move to separate egg
+        # TODO use description and name/alias to make a help string that can be printed to show users what commands and args do
         # TODO: check duplicate command names/alias and argument/alias so it cant be -dimensions w:1 w:2 (width and weight)
         # Let user find out themselves? 
         # TODO reverse? as in get inputs with prefix, remove it, and match on alias, then find index again?
@@ -137,6 +139,7 @@ class Argumentor():
                 errorMessages.append(self.__formatArgumentError(value, "No Argument found"))
                 continue
             
+            # TODO new func for this?
             value = arguments[key]
             if(value is None and not argument.nullable):
                 if(argument.useDefaultValue):
@@ -149,6 +152,7 @@ class Argumentor():
             
             castValue = None
             try:
+                # TODO if cast func
                 castValue = (argument.typeT)(value)
             except:
                 if(argument.useDefaultValue):
@@ -159,8 +163,8 @@ class Argumentor():
                     errorMessages.append(self.__formatArgumentError(value, f"Critical error! {key} could not be cast to {argument.typeT}")) 
                     return None
         
-            if(argument.validators):
-                resultValid = argument.validators(castValue)
+            if(argument.validateFunc):
+                resultValid = argument.validateFunc(castValue)
                 if(not resultValid):
                     if(argument.useDefaultValue):
                         errorMessages.append(self.__formatArgumentError(value, f"{key} did not pass validation, default value {argument.defaultValue} was applied"))
