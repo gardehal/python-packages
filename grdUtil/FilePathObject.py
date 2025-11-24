@@ -1,18 +1,19 @@
 import os
+import re
 
 class FilePathObject():
-    isFile: bool
-    fullPath: str
-    directory: str
-    relativePath: str
-    fileLeaf: str
-    filename: str
-    fileRoot: str
-    extension: str
-    extensionWithDot: str
-    inputPath: str
-    inputPathClean: str
-    fileExists: bool
+    exists: bool = False
+    isFile: bool = False
+    fullPath: str = None
+    directory: str = None
+    relativePath: str = None
+    fileLeaf: str = None
+    filename: str = None
+    fileRoot: str = None
+    extension: str = None
+    extensionWithDot: str = None
+    inputPath: str = None
+    inputPathClean: str = None
 
     def __init__(self, filePath: str, debug: bool = False):
         """
@@ -26,24 +27,28 @@ class FilePathObject():
         Returns:
             FilePathObject: FilePathObject
         """
+        
         if(filePath == None):
             if(debug): print("FilePathObject: Argument path is None.")
-            self.isFile = False
             return None
 
-        if(not os.path.exists(filePath)):
-            self.fileExists = False
+        if(os.path.exists(filePath)):
+            self.exists = True
 
-        if(self.fileExists and not os.path.isfile(filePath)):
-            if(debug): print("FilePathObject: Argument path is not a dir or file.")
-            self.isFile = False
-            return None
+        if(self.exists and os.path.isfile(filePath)):
+            self.isFile = True
 
-        sanitizedFilePath = filePath.replace(r"\\\\|\/\/|\/|\\", os.path.sep)
+        sanitizedFilePath = filePath.split(os.path.sep)
+        print(list(sanitizedFilePath))
+        # sanitizedFilePath = re.sub(r"""\\|""", os.path.sep, filePath)
+        # os.path.splitext
 
+        directory = None
+        fileLeaf = None
+        filename = None
         fullPath = None
         relativePath = None
-        if(self.fileExists):
+        if(self.exists):
             if(os.path.isabs(sanitizedFilePath)):
                 if(debug): 
                     print("FilePathObject: Argument path is absolute.")
@@ -56,25 +61,56 @@ class FilePathObject():
                 
                 fullPath = os.path.abspath(sanitizedFilePath)
                 relativePath = sanitizedFilePath
+                
+            # fileRoot, extension = os.path.splitext(sanitizedFilePath)
+            directory = os.path.split(fullPath)[0]
+            fileLeaf = os.path.split(directory)[-1]
+            filename = os.path.basename(fullPath)
+        else:
+            pathSplit = sanitizedFilePath.split(os.path.sep)
+            print(sanitizedFilePath)
+            print(pathSplit)
+            print(os.path.sep)
+            directory = pathSplit[-2] if len(pathSplit) > 1 else None 
+            fullPath = sanitizedFilePath
+            filename = pathSplit[-1]
         
-        self.isFile: bool = True
-        self.fullPath: str = fullPath
-        self.directory: str = os.path.split(fullPath)[0]
-        self.relativePath: str = relativePath
-        self.fileLeaf: str = os.path.split(self.directory)[-1]
-        self.filename: str = os.path.basename(fullPath)
-        self.fileRoot: str = ".".join(self.filename.split(".")[:-1])
-        self.extension: str =  fullPath.split(".")[-1] if ("." in fullPath) else ""
-        self.extensionWithDot: str = f".{self.extension}"
-        self.inputPath: str = filePath
-        self.inputPathClean: str = sanitizedFilePath
+        self.fullPath = fullPath
+        self.directory = directory
+        self.relativePath = relativePath
+        self.fileLeaf = fileLeaf
+        self.filename = filename
+        self.fileRoot = ".".join(self.filename.split(".")[:-1])
+        self.extension =  fullPath.split(".")[-1] if ("." in fullPath) else None
+        self.extensionWithDot = f".{self.extension}"
+        self.inputPath = filePath
+        self.inputPathClean = sanitizedFilePath
 
         if(debug): 
-            print("FilePathObject: No errors.")
-
-    def help():
+            print("FilePathObject: End.")
+    
+    def toString(self):
         """
-        This function is a developer help-workaround and returns None.\n\n
+        Get a string with all object values. Mainly for debugging.
+        """
+
+        return f"""
+            isFile {self.isFile}
+            fullPath {self.fullPath}
+            directory {self.directory}
+            relativePath {self.relativePath}
+            fileLeaf {self.fileLeaf}
+            filename {self.filename}
+            fileRoot {self.fileRoot}
+            extension {self.extension}
+            extensionWithDot {self.extensionWithDot}
+            inputPath {self.inputPath}
+            inputPathClean {self.inputPathClean}
+            exists {self.exists}""".replace(r"\t", "")
+
+    def help(self):
+        """
+        This function is part of documentation and returns None.\n\n
 
         myObject = FilePathObject(filePath) returns an object with various strings for values in a file URI (more info in file).\n
         Given URI: C:\\users\\OddThinking\\Documents\\My Source\\Widget\\foo.src
@@ -92,7 +128,6 @@ class FilePathObject():
         """
 
         return None
-
 
     # https://stackoverflow.com/questions/2235173/what-is-the-naming-standard-for-path-components
     # Consider the URI:
