@@ -14,6 +14,7 @@ class FilePathObject():
     extensionWithDot: str = None
     inputPath: str = None
     inputPathClean: str = None
+    inputPathSplit: list[str] = None
 
     def __init__(self, filePath: str, debug: bool = False):
         """
@@ -38,53 +39,41 @@ class FilePathObject():
         if(self.exists and os.path.isfile(filePath)):
             self.isFile = True
 
-        sanitizedFilePath = filePath.split(os.path.sep)
-        print(list(sanitizedFilePath))
-        # sanitizedFilePath = re.sub(r"""\\|""", os.path.sep, filePath)
-        # os.path.splitext
+        pathSplit = list(filter(None, re.split(r"\\?\\|\/?\/", filePath)))
+        sanitizedFilePath = os.path.sep.join(pathSplit)
 
-        directory = None
-        fileLeaf = None
-        filename = None
         fullPath = None
+        directory = None
+        filename = None
         relativePath = None
         if(self.exists):
             if(os.path.isabs(sanitizedFilePath)):
-                if(debug): 
-                    print("FilePathObject: Argument path is absolute.")
-                
                 fullPath = sanitizedFilePath
                 relativePath = os.path.realpath(fullPath)
             else:
-                if(debug): 
-                    print("FilePathObject: Argument path is relative.")
-                
                 fullPath = os.path.abspath(sanitizedFilePath)
                 relativePath = sanitizedFilePath
                 
-            # fileRoot, extension = os.path.splitext(sanitizedFilePath)
-            directory = os.path.split(fullPath)[0]
-            fileLeaf = os.path.split(directory)[-1]
+            directory = os.path.dirname(fullPath)
             filename = os.path.basename(fullPath)
         else:
-            pathSplit = sanitizedFilePath.split(os.path.sep)
-            print(sanitizedFilePath)
-            print(pathSplit)
-            print(os.path.sep)
             directory = pathSplit[-2] if len(pathSplit) > 1 else None 
             fullPath = sanitizedFilePath
             filename = pathSplit[-1]
         
+        fileRoot, extension = os.path.splitext(filename)
+        
         self.fullPath = fullPath
         self.directory = directory
         self.relativePath = relativePath
-        self.fileLeaf = fileLeaf
+        self.fileLeaf = os.path.sep.join([self.directory, filename]) if self.directory else None
         self.filename = filename
-        self.fileRoot = ".".join(self.filename.split(".")[:-1])
-        self.extension =  fullPath.split(".")[-1] if ("." in fullPath) else None
-        self.extensionWithDot = f".{self.extension}"
+        self.fileRoot = fileRoot
+        self.extension = extension if extension else None
+        self.extensionWithDot = self.extension.removeprefix(".") if self.extension else None
         self.inputPath = filePath
         self.inputPathClean = sanitizedFilePath
+        self.inputPathSplit = pathSplit
 
         if(debug): 
             print("FilePathObject: End.")
@@ -94,19 +83,20 @@ class FilePathObject():
         Get a string with all object values. Mainly for debugging.
         """
 
-        return f"""
-            isFile {self.isFile}
-            fullPath {self.fullPath}
-            directory {self.directory}
-            relativePath {self.relativePath}
-            fileLeaf {self.fileLeaf}
-            filename {self.filename}
-            fileRoot {self.fileRoot}
-            extension {self.extension}
-            extensionWithDot {self.extensionWithDot}
-            inputPath {self.inputPath}
-            inputPathClean {self.inputPathClean}
-            exists {self.exists}""".replace(r"\t", "")
+        return f"""{self}
+exists {self.exists}
+isFile {self.isFile}
+fullPath {self.fullPath}
+directory {self.directory}
+relativePath {self.relativePath}
+fileLeaf {self.fileLeaf}
+filename {self.filename}
+fileRoot {self.fileRoot}
+extension {self.extension}
+extensionWithDot {self.extensionWithDot}
+inputPath {self.inputPath}
+inputPathClean {self.inputPathClean}
+inputPathSplit {self.inputPathSplit}"""
 
     def help(self):
         """
