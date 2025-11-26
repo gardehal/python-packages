@@ -5,8 +5,8 @@ class FilePathObject():
     exists: bool = False
     isFile: bool = False
     fullPath: str = None
-    directory: str = None
     relativePath: str = None
+    directory: str = None
     fileLeaf: str = None
     filename: str = None
     fileRoot: str = None
@@ -43,9 +43,9 @@ class FilePathObject():
         sanitizedFilePath = os.path.sep.join(pathSplit)
 
         fullPath = None
+        relativePath = None
         directory = None
         filename = None
-        relativePath = None
         if(self.exists):
             if(os.path.isabs(sanitizedFilePath)):
                 fullPath = sanitizedFilePath
@@ -57,20 +57,21 @@ class FilePathObject():
             directory = os.path.dirname(fullPath)
             filename = os.path.basename(fullPath)
         else:
-            directory = pathSplit[-2] if len(pathSplit) > 1 else None 
             fullPath = sanitizedFilePath
+            relativePath = sanitizedFilePath
+            directory = pathSplit[-2] if len(pathSplit) > 1 else None 
             filename = pathSplit[-1]
         
         fileRoot, extension = os.path.splitext(filename)
         
         self.fullPath = fullPath
-        self.directory = directory
         self.relativePath = relativePath
+        self.directory = directory
         self.fileLeaf = os.path.sep.join([self.directory, filename]) if self.directory else None
         self.filename = filename
         self.fileRoot = fileRoot
         self.extension = extension.removeprefix(".") if extension else None
-        self.extensionWithDot = self.extension if self.extension else None
+        self.extensionWithDot = extension if extension else None
         self.inputPath = filePath
         self.inputPathClean = sanitizedFilePath
         self.inputPathSplit = pathSplit
@@ -87,8 +88,8 @@ class FilePathObject():
 exists {self.exists}
 isFile {self.isFile}
 fullPath {self.fullPath}
-directory {self.directory}
 relativePath {self.relativePath}
+directory {self.directory}
 fileLeaf {self.fileLeaf}
 filename {self.filename}
 fileRoot {self.fileRoot}
