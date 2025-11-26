@@ -69,8 +69,8 @@ class FilePathObject():
         self.fileLeaf = os.path.sep.join([self.directory, filename]) if self.directory else None
         self.filename = filename
         self.fileRoot = fileRoot
-        self.extension = extension if extension else None
-        self.extensionWithDot = self.extension.removeprefix(".") if self.extension else None
+        self.extension = extension.removeprefix(".") if extension else None
+        self.extensionWithDot = self.extension if self.extension else None
         self.inputPath = filePath
         self.inputPathClean = sanitizedFilePath
         self.inputPathSplit = pathSplit
