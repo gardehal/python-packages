@@ -1,19 +1,24 @@
-# python-packages
+# python-packages / GrdUtil
 
 Collection of general Python functions.
 
+[![Publish to PyPI](https://github.com/gardehal/python-packages/actions/workflows/publish.yml/badge.svg)](https://github.com/gardehal/python-packages/actions/workflows/publish.yml)
+[![GitHub Release](https://img.shields.io/github/release/gardehal/python-packages.svg)]()
+[![MIT License](https://img.shields.io/badge/license-MIT-blue)](https://github.com/gardehal/python-packages/blob/main/LICENSE)
+
+
 ## Install locally
 
-1. $ `cd [path to this folder]`
-1. Install PipReqs to install all dependencies 
-    - $ `python -m pip install pipreqs` 
-    - $ `pipreqs .`
-    - $ `python -m pip install -r requirements.txt`
-1. $ `python pip install .`
-1. Check installed packages
-    - $ `python pip list`
-1. Purge (external) packages
-    - $ `python -m pip cache purge`
+[PyPi project](https://pypi.org/project/grdutil/)
+
+Install using pip
+- $ `pip install grdutil`
+- In python files: `from GrdUtil import *` 
+
+Install from files locally
+- $ `cd [path to this folder]`
+- $ `pip cache purge` (may help if old packages are cached)
+- $ `pip install .`
 
 ## Errors
 
